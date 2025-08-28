@@ -2,6 +2,10 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    #region General
+
+    #region Variables
+
     //ESSENTIALS
     private PlayerManager pM;
     private Rigidbody2D rb;
@@ -93,6 +97,10 @@ public class PlayerController : MonoBehaviour
     private float wallJumpCoyoteTimeCounter;
     public float maxWallSlideSpeed;
 
+    #endregion
+
+    #region BuiltInEngineVoids
+
     void Awake()
     {
         currentSpeed = 0;
@@ -106,188 +114,17 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //STATE MACHINE
-        switch (currentState)
-        {
-            case PlayerStates.Idle: // IDLE
+        StateMachineHandling();
+        FunctionalityHandling();
+        GraphicHandling();
+    }
 
-                CheckForMovement();
-                CheckForAbilities();
+    #endregion
 
-                coyoteTimeCounter = coyoteTime;
+    #region StandaloneChecks
 
-                if (currentState == PlayerStates.Idle)
-                {
-                    anim.Play(idleAnimation.ToString());
-                }
-
-                break;
-
-            case PlayerStates.Walk: // WALK / RUN
-
-                CheckForMovement();
-                CheckForAbilities();
-
-                coyoteTimeCounter = coyoteTime;
-
-                if (currentState == PlayerStates.Walk)
-                {
-                    if (rb.linearVelocityX == 0)
-                    {
-                        currentState = PlayerStates.Idle;
-                    }
-
-                    if (currentState == PlayerStates.Walk)
-                    {
-                        anim.Play(runAnimation.ToString());
-                    }
-                }
-
-                break;
-
-            case PlayerStates.Jump: // JUMP
-
-                CheckForHorizontalMovement();
-                WhileJumping();
-                CheckForAbilities();
-
-                break;
-
-            case PlayerStates.Fall: // FALL
-
-                CheckForHorizontalMovement();
-                CheckForAbilities();
-
-                if (currentState == PlayerStates.Fall)
-                {
-                    Fall();
-                    WhileFalling();
-                }
-
-                break;
-
-            case PlayerStates.Landing: // LANDING
-
-                coyoteTimeCounter = coyoteTime;
-
-                landingTimer -= Time.deltaTime;
-
-                if (landingTimer <= 0 && currentState == PlayerStates.Landing)
-                {
-                    currentState = PlayerStates.Idle;
-                    landingTimer = landingCooldown;
-                }
-                else if (currentState == PlayerStates.Landing)
-                {
-                    anim.Play(landingAnimation.ToString());
-                }
-
-                CheckForMovement();
-                CheckForAbilities();
-
-                break;
-
-            case PlayerStates.Dash: // DASH / BASH
-
-                CheckForDashChaining();
-
-                if (isGrounded && bashDir.y < 0)
-                {
-                    rb.linearVelocityY = 0;
-                    currentState = PlayerStates.ExitDash;
-                    return;
-                }
-
-                if (bashTimer <= 0)
-                {
-                    // Only apply upward velocity if we're in the air
-                    if (!isGrounded && rb.linearVelocityY > 0)
-                    {
-                        if (rb.linearVelocityX == 0)
-                        {
-                            rb.linearVelocityY = maxSpeed * 1.5f;
-                        }
-                        else
-                        {
-                            rb.linearVelocityY = maxSpeed;
-                        }
-                    }
-
-                    rb.gravityScale = jumpCutGravity;
-                    currentState = PlayerStates.ExitDash;
-                }
-                else
-                {
-                    rb.linearVelocity = launchVelocity * bashDir;
-                    bashTimer -= Time.deltaTime;
-                }
-
-                if (bashLockTimer <= 0)
-                {
-                    CheckForHorizontalMovement();
-                    CheckForAbilities();
-
-                    if ((Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S)) && rb.linearVelocityY > 0)
-                    {
-                        rb.linearVelocityY = maxSpeed;
-                        currentState = PlayerStates.ExitDash;
-                    }
-                }
-                else
-                {
-                    bashLockTimer -= Time.deltaTime;
-                }
-
-                break;
-
-            case PlayerStates.ExitDash: // EXIT DASH / EXIT BASH
-
-                CheckForHorizontalMovement();
-                CheckForAbilities();
-
-                rb.gravityScale = exitBashGravity;
-
-                if (rb.linearVelocityY <= hangTimeVelocityThreshold)
-                {
-                    rb.gravityScale = hangTimeGravity; //bonus air time
-                    SetStateToFall();
-                }
-
-                trail.emitting = false;
-
-                break;
-
-            case PlayerStates.WallSlide: // WALL SLIDE
-
-                wallJumpCoyoteTimeCounter = wallJumpCoyoteTime;
-                CheckForHorizontalMovement();
-                CheckForAbilities();
-
-                if (currentState == PlayerStates.WallSlide)
-                {
-                    rb.gravityScale = wallSlideGravity;
-
-                    rb.linearVelocityY = Mathf.Clamp(rb.linearVelocityY, -maxWallSlideSpeed, 0); //can't slide faster than max
-
-                    anim.Play(wallSlideAnimation.ToString());
-                }
-
-                break;
-
-            case PlayerStates.WallJump: // WALL JUMP
-
-                wallJumpLockTimer -= Time.deltaTime;
-                CheckForAbilities();
-                WhileJumping();
-
-                if (wallJumpLockTimer < 0)
-                {
-                    CheckForHorizontalMovement();
-                }
-
-                break;
-        }
-
+    void FunctionalityHandling()
+    {
         RaycastHit2D groundCheck = Physics2D.Raycast(new Vector2(col.bounds.min.x + 0.3f, col.bounds.min.y - groundCheckDistance), Vector2.right, col.bounds.max.x - col.bounds.min.x - 0.55f, groundLayer); //checking in a horizontal line right bellow player's feet
         isGrounded = groundCheck.collider != null;
         Debug.DrawLine(new Vector2(col.bounds.min.x, col.bounds.min.y - groundCheckDistance), new Vector2(col.bounds.max.x, col.bounds.min.y - groundCheckDistance), Color.red);
@@ -324,11 +161,115 @@ public class PlayerController : MonoBehaviour
 
                 break;
         }
+    }
 
+    #endregion
+
+    #endregion
+
+    #region Visuals
+
+    void GraphicHandling()
+    {
         transform.localScale = new Vector2(direction, transform.localScale.y);
     }
 
-    #region Checks
+    #endregion
+
+    #region StateMachine
+
+    #region StateMachineHandling
+
+    void StateMachineHandling()
+    {
+        switch (currentState)
+        {
+            case PlayerStates.Idle: // IDLE
+
+                WhileIdling();
+                CheckForMovement();
+                CheckForAbilities();
+
+                break;
+
+            case PlayerStates.Walk: // WALK / RUN
+
+                WhileWalking();
+                CheckForMovement();
+                CheckForAbilities();
+
+                break;
+
+            case PlayerStates.Jump: // JUMP
+
+                CheckForHorizontalMovement();
+                WhileJumping();
+                CheckForAbilities();
+
+                break;
+
+            case PlayerStates.Fall: // FALL
+
+                Fall();
+                WhileFalling();
+                CheckForHorizontalMovement();
+                CheckForAbilities();
+
+                break;
+
+            case PlayerStates.Landing: // LANDING
+
+                WhileLanding();
+                CheckForMovement();
+                CheckForAbilities();
+
+                break;
+
+            case PlayerStates.Dash: // DASH / BASH
+
+                CheckForDashChaining();
+                CheckingForDashExits();
+
+                break;
+
+            case PlayerStates.ExitDash: // EXIT DASH / EXIT BASH
+
+                ExitingDash();
+                CheckForHorizontalMovement();
+                CheckForAbilities();
+
+                break;
+
+            case PlayerStates.WallSlide: // WALL SLIDE
+
+                WhileWallSliding();
+                CheckForHorizontalMovement();
+                CheckForAbilities();
+
+                break;
+
+            case PlayerStates.WallJump: // WALL JUMP
+
+                wallJumpLockTimer -= Time.deltaTime;
+
+                WhileJumping();
+
+                if (wallJumpLockTimer < 0)
+                {
+                    CheckForHorizontalMovement();
+                }
+
+                CheckForAbilities();
+
+                break;
+        }
+    }
+
+    #endregion
+
+    #region MainMovementChecks
+
+    #region MovementChecks
 
     void CheckForMovement()
     {
@@ -342,11 +283,9 @@ public class PlayerController : MonoBehaviour
         {
             direction = 1;
 
-            if (wallSlideDirection == direction && isPressedToAWall && currentState != PlayerStates.WallSlide)
+            if (wallJumpEnabled)
             {
-                rb.linearVelocityY = minWallSlideVelocity;
-                rb.linearVelocityX = 0;
-                currentState = PlayerStates.WallSlide;
+                CheckForWallJump();
             }
 
             Movement();
@@ -355,23 +294,26 @@ public class PlayerController : MonoBehaviour
         {
             direction = -1;
 
-            if (wallSlideDirection == direction && isPressedToAWall && currentState != PlayerStates.WallSlide)
+            if (wallJumpEnabled)
             {
-                rb.linearVelocityY = minWallSlideVelocity;
-                rb.linearVelocityX = 0;
-                currentState = PlayerStates.WallSlide;
+                CheckForWallJump();
             }
 
             Movement();
         }
-        else if (currentState != PlayerStates.Dash && currentState != PlayerStates.WallSlide)
+        else if (currentState != PlayerStates.WallSlide)
         {
             Decelerate(direction, deceleration); //slow down
         }
+    }
 
-        if (currentState == PlayerStates.WallSlide && (!isPressedToAWall || wallSlideDirection != direction))
+    void CheckForWallJump()
+    {
+        if (wallSlideDirection == direction && isPressedToAWall && currentState != PlayerStates.WallSlide)
         {
-            SetStateToFall();
+            rb.linearVelocityY = minWallSlideVelocity;
+            rb.linearVelocityX = 0;
+            currentState = PlayerStates.WallSlide;
         }
     }
 
@@ -426,20 +368,6 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    void CheckForDashChaining()
-    {
-        if (Input.GetKeyDown(KeyCode.X) || Input.GetKeyDown(KeyCode.LeftShift))
-        {
-            bashInputBufferCounter = bashInputBuffer;
-        }
-
-        if (bashInputBufferCounter > 0)
-        {
-            bashInputBufferCounter -= Time.deltaTime;
-            SearchForBashTargets();
-        }
-    }
-
     #endregion
 
     #region Movement
@@ -448,40 +376,26 @@ public class PlayerController : MonoBehaviour
     {
         currentSpeed += acceleration * Time.deltaTime;
         currentSpeed = Mathf.Clamp(currentSpeed, 0, maxSpeed); // Can't go above max
-        int bashX = Mathf.Abs(bashDir.x) < 0.1f ? 0 : (int)Mathf.Sign(bashDir.x);
 
-        if (currentState != PlayerStates.Dash)
+        // Handling direction change
+        if (rb.linearVelocityX * direction < 0) // Moving opposite to desired direction
         {
-            // Handling direction change
-            if (rb.linearVelocityX * direction < 0) // Moving opposite to desired direction
+            if (isGrounded)
             {
-                if (isGrounded)
-                {
-                    currentSpeed = 0;
-                }
-                else
-                {
-                    Decelerate(-direction, airTurnDeceleration);
-                    return;
-                }
+                currentSpeed = 0;
             }
-
-            rb.linearVelocityX = currentSpeed * direction;
-
-            if (Mathf.Abs(rb.linearVelocityX) < minMovementSpeed && currentSpeed > 0)
+            else
             {
-                rb.linearVelocityX = minMovementSpeed * direction; //minimal movement value when the button is pressed
+                Decelerate(-direction, airTurnDeceleration);
+                return;
             }
         }
-        else if (direction != bashX && bashX != 0)
-        {
-            rb.linearVelocityY = maxSpeed;
-            currentState = PlayerStates.ExitDash;
-        }
 
-        if (currentState == PlayerStates.Idle || currentState == PlayerStates.Landing)
+        rb.linearVelocityX = currentSpeed * direction;
+
+        if (Mathf.Abs(rb.linearVelocityX) < minMovementSpeed && currentSpeed > 0)
         {
-            currentState = PlayerStates.Walk;
+            rb.linearVelocityX = minMovementSpeed * direction; //minimal movement value when the button is pressed
         }
     }
 
@@ -495,6 +409,44 @@ public class PlayerController : MonoBehaviour
         }
 
         rb.linearVelocityX = currentSpeed * dir;
+    }
+
+    #endregion
+
+    #endregion
+
+    #region States
+
+    #region Idle
+
+    void WhileIdling()
+    {
+        anim.Play(idleAnimation.ToString());
+        coyoteTimeCounter = coyoteTime;
+
+        if (currentSpeed != 0)
+        {
+            currentState = PlayerStates.Walk;
+        }
+    }
+
+    #endregion
+
+    #region Walk
+
+    void WhileWalking()
+    {
+        coyoteTimeCounter = coyoteTime;
+
+        if (rb.linearVelocityX == 0)
+        {
+            currentState = PlayerStates.Idle;
+        }
+
+        if (currentState == PlayerStates.Walk)
+        {
+            anim.Play(runAnimation.ToString());
+        }
     }
 
     #endregion
@@ -587,6 +539,33 @@ public class PlayerController : MonoBehaviour
 
     #endregion
 
+    #region Landing
+
+    void WhileLanding()
+    {
+        coyoteTimeCounter = coyoteTime;
+
+        landingTimer -= Time.deltaTime;
+
+        if (landingTimer <= 0)
+        {
+            currentState = PlayerStates.Idle;
+            landingTimer = landingCooldown;
+            return;
+        }
+        else
+        {
+            anim.Play(landingAnimation.ToString());
+        }
+
+        if (currentSpeed != 0)
+        {
+            currentState = PlayerStates.Walk;
+        }
+    }
+
+    #endregion
+
     #region Bash
 
     void SearchForBashTargets() 
@@ -635,9 +614,123 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    void CheckForDashChaining()
+    {
+        if (Input.GetKeyDown(KeyCode.X) || Input.GetKeyDown(KeyCode.LeftShift))
+        {
+            bashInputBufferCounter = bashInputBuffer;
+        }
+
+        if (bashInputBufferCounter > 0)
+        {
+            bashInputBufferCounter -= Time.deltaTime;
+            SearchForBashTargets();
+        }
+    }
+
+    void CheckingForDashExits()
+    {
+        if (isGrounded && bashDir.y < 0)
+        {
+            rb.linearVelocityY = 0;
+            currentState = PlayerStates.ExitDash;
+            return;
+        }
+
+        if (bashTimer <= 0)
+        {
+            // Only apply upward velocity if we're in the air
+            if (!isGrounded && rb.linearVelocityY > 0)
+            {
+                if (rb.linearVelocityX == 0)
+                {
+                    rb.linearVelocityY = maxSpeed * 1.5f;
+                }
+                else
+                {
+                    rb.linearVelocityY = maxSpeed;
+                }
+            }
+
+            rb.gravityScale = jumpCutGravity;
+            currentState = PlayerStates.ExitDash;
+        }
+        else
+        {
+            rb.linearVelocity = launchVelocity * bashDir;
+            bashTimer -= Time.deltaTime;
+        }
+
+        if (bashLockTimer <= 0)
+        {
+            CheckForDashCancelling();
+            CheckForAbilities();
+
+            if ((Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S)) && rb.linearVelocityY > 0)
+            {
+                rb.linearVelocityY = maxSpeed;
+                currentState = PlayerStates.ExitDash;
+            }
+        }
+        else
+        {
+            bashLockTimer -= Time.deltaTime;
+        }
+    }
+
+    void CheckForDashCancelling()
+    {
+        if (Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D)) //right movement
+        {
+            direction = 1;
+        }
+
+        else if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A)) //left movement
+        {
+            direction = -1;
+        }
+
+        int bashX = Mathf.Abs(bashDir.x) < 0.1f ? 0 : (int)Mathf.Sign(bashDir.x);
+
+        if (direction != bashX && bashX != 0)
+        {
+            rb.linearVelocityY = maxSpeed;
+            currentState = PlayerStates.ExitDash;
+        }
+    }
+
+    void ExitingDash()
+    {
+        rb.gravityScale = exitBashGravity;
+
+        if (rb.linearVelocityY <= hangTimeVelocityThreshold)
+        {
+            rb.gravityScale = hangTimeGravity; //bonus air time
+            SetStateToFall();
+        }
+
+        trail.emitting = false;
+    }
+
     #endregion
 
     #region WallJump
+
+    void WhileWallSliding()
+    {
+        wallJumpCoyoteTimeCounter = wallJumpCoyoteTime;
+
+        rb.gravityScale = wallSlideGravity;
+
+        rb.linearVelocityY = Mathf.Clamp(rb.linearVelocityY, -maxWallSlideSpeed, 0); //can't slide faster than max
+
+        anim.Play(wallSlideAnimation.ToString());
+
+        if (!isPressedToAWall || wallSlideDirection != direction)
+        {
+            SetStateToFall();
+        }
+    }
 
     void WallJump()
     {
@@ -669,7 +762,13 @@ public class PlayerController : MonoBehaviour
     }
 
     #endregion
+
+    #endregion
+
+    #endregion
 }
+
+#region CustomEnums
 
 public enum PlayerStates
 {
@@ -684,3 +783,5 @@ public enum PlayerAnimations
     fallStartSketch, fallEndSketch, 
     landingSketch
 }
+
+#endregion

@@ -2971,7 +2971,7 @@ MonoBehaviour:
   landingCooldown: 0.12
   coyoteTime: 0.125
   jumpBufferTime: 0.125
-  bashEnabled: 0
+  bashEnabled: 1
   bashDetectionRangeX: 4
   bashDetectionRangeY: 1.6
   launchVelocity: 38
@@ -3455,7 +3455,6 @@ GameObject:
   - component: {fileID: 6486196346540075078}
   - component: {fileID: 604885321520092026}
   - component: {fileID: 336829329198497084}
-  - component: {fileID: 9186109909372338937}
   - component: {fileID: 9186109909372338938}
   m_Layer: 0
   m_Name: player
@@ -4330,24 +4329,6 @@ Transform:
   - {fileID: 2050646174}
   m_Father: {fileID: 1591845582692089910}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &9186109909372338937
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3317091793976538903}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8231f26ae64b2b4458c5342104e4c825, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  healthBar: {fileID: 1986375376}
-  healthBarComponents: []
-  activeHealth: {r: 0, g: 0, b: 0, a: 1}
-  inactiveHealth: {r: 0, g: 0, b: 0, a: 1}
-  health: 0
-  maxHealth: 3
 --- !u!96 &9186109909372338938
 TrailRenderer:
   serializedVersion: 3
