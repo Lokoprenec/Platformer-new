@@ -2926,82 +2926,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &336829329198497084
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3317091793976538903}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0600abe780151db43980b2373839bc8c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  currentMovementState: 0
-  graphic: {fileID: 2050646175}
-  idleAnimation: 1
-  runAnimation: 3
-  jumpAnimation: 4
-  fallAnimation: 6
-  landingAnimation: 8
-  dashAnimation: 4
-  wallSlideAnimation: 5
-  wallJumpAnimation: 4
-  wallPressAnimation: 8
-  runTransitionAnimation: 9
-  landingRunTransitionAnimation: 11
-  turnTransitionAnimation: 10
-  landingCooldownMultiplier: 0.075
-  minLandingTime: 0.05
-  maxFallTime: 4
-  absoluteTurnLockCooldown: 0.125
-  trail: {fileID: 9186109909372338938}
-  direction: 1
-  acceleration: 60
-  deceleration: 110
-  maxSpeed: 12
-  currentSpeed: 0
-  minMovementSpeed: 3
-  airTurnDeceleration: 150
-  jumpForce: 18
-  maxFallSpeed: 50
-  initialGravity: 2.75
-  jumpCutGravity: 8
-  fallGravity: 3.5
-  hangTimeVelocityThreshold: 0.1
-  hangTimeGravity: 2
-  isGrounded: 0
-  groundCheckDistance: 0.1
-  groundLayer:
-    serializedVersion: 2
-    m_Bits: 8
-  coyoteTime: 0.125
-  jumpBufferTime: 0.125
-  bashEnabled: 1
-  bashDetectionRangeX: 4
-  bashDetectionRangeY: 1.6
-  launchVelocity: 38
-  bashLockTime: 0.135
-  bashGravity: 0
-  bashTime: 0.25
-  bashTargetLayer:
-    serializedVersion: 2
-    m_Bits: 64
-  exitBashGravity: 10
-  bashInputBuffer: 0.125
-  wallJumpEnabled: 1
-  isPressedToAWall: 0
-  wallSlideGravity: 1.25
-  wallSlideDirection: 0
-  wallSlideSetDirection: 0
-  minWallSlideVelocity: -3
-  wallJumpLockTime: 0.125
-  wallJumpHorizontalForce: 8
-  wallJumpVerticalForce: 18
-  wallJumpBuffer: 0.125
-  wallJumpCoyoteTime: 0.125
-  maxWallSlideSpeed: 20
 --- !u!61 &531244414307276460
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -3461,7 +3385,7 @@ GameObject:
   - component: {fileID: 5327987570922226139}
   - component: {fileID: 6486196346540075078}
   - component: {fileID: 604885321520092026}
-  - component: {fileID: 336829329198497084}
+  - component: {fileID: 9186109909372338939}
   - component: {fileID: 9186109909372338937}
   - component: {fileID: 9186109909372338938}
   m_Layer: 0
@@ -4225,6 +4149,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1591845582692089910}
   - component: {fileID: 4203827281785658908}
+  - component: {fileID: 8432393234638237752}
   m_Layer: 0
   m_Name: Scene Manager
   m_TagString: Untagged
@@ -4232,6 +4157,26 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &8432393234638237752
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8432393234638237751}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c15d74e67a89a44daef90a5258d6219, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Exit: 27
+  Select: 8
+  Left: 276
+  Right: 275
+  Up: 273
+  Down: 274
+  Jump: 32
+  Bash: 120
 --- !u!1 &8574003786625113699
 GameObject:
   m_ObjectHideFlags: 0
@@ -4471,6 +4416,83 @@ TrailRenderer:
   m_Autodestruct: 0
   m_Emitting: 0
   m_ApplyActiveColorSpace: 1
+--- !u!114 &9186109909372338939
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3317091793976538903}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0600abe780151db43980b2373839bc8c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  keybindManager: {fileID: 8432393234638237752}
+  currentMovementState: 0
+  graphic: {fileID: 2050646175}
+  idleAnimation: 1
+  runAnimation: 3
+  jumpAnimation: 4
+  fallAnimation: 6
+  landingAnimation: 8
+  dashAnimation: 4
+  wallSlideAnimation: 5
+  wallJumpAnimation: 4
+  wallPressAnimation: 8
+  runTransitionAnimation: 9
+  landingRunTransitionAnimation: 11
+  turnTransitionAnimation: 10
+  landingCooldownMultiplier: 0.08
+  minLandingTime: 0.05
+  maxFallTime: 4
+  absoluteTurnLockCooldown: 0.125
+  trail: {fileID: 9186109909372338938}
+  direction: 1
+  acceleration: 60
+  deceleration: 110
+  maxSpeed: 12
+  currentSpeed: 0
+  minMovementSpeed: 3
+  airTurnDeceleration: 150
+  jumpForce: 18
+  maxFallSpeed: 50
+  initialGravity: 2.75
+  jumpCutGravity: 8
+  fallGravity: 3.5
+  hangTimeVelocityThreshold: 0.1
+  hangTimeGravity: 2
+  isGrounded: 0
+  groundCheckDistance: 0.1
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 8
+  coyoteTime: 0.125
+  jumpBufferTime: 0.125
+  bashEnabled: 1
+  bashDetectionRangeX: 4
+  bashDetectionRangeY: 1.6
+  launchVelocity: 38
+  bashLockTime: 0.135
+  bashGravity: 0
+  bashTime: 0.25
+  bashTargetLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  exitBashGravity: 10
+  bashInputBuffer: 0.125
+  wallJumpEnabled: 1
+  isPressedToAWall: 0
+  wallSlideGravity: 1.25
+  wallSlideDirection: 0
+  wallSlideSetDirection: 0
+  minWallSlideVelocity: -3
+  wallJumpLockTime: 0.125
+  wallJumpHorizontalForce: 8
+  wallJumpVerticalForce: 18
+  wallJumpBuffer: 0.125
+  wallJumpCoyoteTime: 0.125
+  maxWallSlideSpeed: 20
 --- !u!1 &9198683796826355039
 GameObject:
   m_ObjectHideFlags: 0

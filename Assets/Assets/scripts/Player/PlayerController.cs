@@ -11,6 +11,8 @@ public class PlayerController : MonoBehaviour
     private Rigidbody2D rb;
     private BoxCollider2D col;
 
+    public KeybindManager keybindManager;
+
     public MovementStates currentMovementState;
 
     [Header("Visuals")]
@@ -156,7 +158,7 @@ public class PlayerController : MonoBehaviour
             case 1:
 
                 wallSlideDirection = 1;
-                wallCheck = Physics2D.Raycast(new Vector2(col.bounds.max.x + 0.6f, col.bounds.max.y - 0.3f), Vector2.down, col.bounds.max.y - col.bounds.min.y - 0.6f, groundLayer);
+                wallCheck = Physics2D.Raycast(new Vector2(col.bounds.max.x + 0.6f, col.bounds.max.y - 0.3f), Vector2.down, col.bounds.max.y - col.bounds.min.y - 0.9f, groundLayer);
 
                 #if UNITY_EDITOR
                 Debug.DrawLine(new Vector2(col.bounds.max.x, col.bounds.max.y - 0.3f), new Vector2(col.bounds.max.x, col.bounds.min.y + 0.3f), Color.red);
@@ -174,7 +176,7 @@ public class PlayerController : MonoBehaviour
             case -1:
 
                 wallSlideDirection = -1;
-                wallCheck = Physics2D.Raycast(new Vector2(col.bounds.min.x - 0.6f, col.bounds.max.y - 0.3f), Vector2.down, col.bounds.max.y - col.bounds.min.y - 0.6f, groundLayer);
+                wallCheck = Physics2D.Raycast(new Vector2(col.bounds.min.x - 0.6f, col.bounds.max.y - 0.3f), Vector2.down, col.bounds.max.y - col.bounds.min.y - 0.9f, groundLayer);
 
                 #if UNITY_EDITOR
                 Debug.DrawLine(new Vector2(col.bounds.min.x, col.bounds.max.y - 0.3f), new Vector2(col.bounds.min.x, col.bounds.min.y + 0.3f), Color.red);
@@ -190,7 +192,7 @@ public class PlayerController : MonoBehaviour
                 break;
         }
 
-        if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D))
+        if (Input.GetKey(keybindManager.Left) || Input.GetKey(keybindManager.Right))
         {
             isTryingToRun = true;
         }
@@ -198,6 +200,13 @@ public class PlayerController : MonoBehaviour
         {
             isTryingToRun = false;
         }
+    }
+
+    private int GetAxis(KeyCode negative, KeyCode positive)
+    {
+        if (Input.GetKey(negative)) return -1;
+        if (Input.GetKey(positive)) return 1;
+        return 0;
     }
 
     #endregion
@@ -454,7 +463,7 @@ public class PlayerController : MonoBehaviour
 
     void CheckForHorizontalMovement()
     {
-        if (Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D)) //right movement
+        if (Input.GetKey(keybindManager.Right)) //right movement
         {
             direction = 1;
 
@@ -465,7 +474,7 @@ public class PlayerController : MonoBehaviour
 
             Movement();
         }
-        else if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A)) //left movement
+        else if (Input.GetKey(keybindManager.Left)) //left movement
         {
             direction = -1;
 
@@ -494,7 +503,7 @@ public class PlayerController : MonoBehaviour
 
     void CheckForVerticalMovement()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(keybindManager.Jump))
         {
             jumpBufferCounter = jumpBufferTime;
         }
@@ -516,7 +525,7 @@ public class PlayerController : MonoBehaviour
 
     void CheckForAbilities()
     {
-        if (Input.GetKeyDown(KeyCode.X))
+        if (Input.GetKeyDown(keybindManager.Bash))
         {
             bashInputBufferCounter = bashInputBuffer;
         }
@@ -527,7 +536,7 @@ public class PlayerController : MonoBehaviour
             SearchForBashTargets();
         }
 
-        if (Input.GetKeyDown(KeyCode.Space) && (!isGrounded || (isGrounded && currentMovementState == MovementStates.WallSlide)))
+        if (Input.GetKeyDown(keybindManager.Jump) && (!isGrounded || (isGrounded && currentMovementState == MovementStates.WallSlide)))
         {
             wallJumpBufferCounter = wallJumpBuffer;
         }
@@ -655,7 +664,7 @@ public class PlayerController : MonoBehaviour
         {
             SetStateToFall();
         }
-        else if (!Input.GetKey(KeyCode.Space))
+        else if (!Input.GetKey(keybindManager.Jump))
         {
             rb.gravityScale = jumpCutGravity; //cuts the jump when the button is released
         }
@@ -679,7 +688,7 @@ public class PlayerController : MonoBehaviour
 
     void WhileFalling()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(keybindManager.Jump))
         {
             jumpBufferCounter = jumpBufferTime;
         }
@@ -730,6 +739,7 @@ public class PlayerController : MonoBehaviour
 
     void Bash(Transform target)
     {
+        // Core setup (same as before)
         transform.position = target.position;
         isGrounded = false;
         currentMovementState = MovementStates.Dash;
@@ -738,21 +748,23 @@ public class PlayerController : MonoBehaviour
         coyoteTimeCounter = 0;
         jumpBufferCounter = 0;
         rb.gravityScale = bashGravity;
-        transform.position = target.position;
         rb.linearVelocity = Vector2.zero;
         bashLockTimer = bashLockTime;
         bashTimer = bashTime;
-        bashDir = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")).normalized;
 
-        if (bashDir.x == 0 && bashDir.y == 0)
-        {
-            bashDir.y = 1;
-        }
+        // Use helper
+        int x = GetAxis(keybindManager.Left, keybindManager.Right);
+        int y = GetAxis(keybindManager.Down, keybindManager.Up);
+
+        bashDir = new Vector2(x, y);
+
+        if (bashDir == Vector2.zero)
+            bashDir = Vector2.up;
     }
 
     void CheckForDashChaining()
     {
-        if (Input.GetKeyDown(KeyCode.X) || Input.GetKeyDown(KeyCode.LeftShift))
+        if (Input.GetKeyDown(keybindManager.Bash))
         {
             bashInputBufferCounter = bashInputBuffer;
         }
@@ -802,7 +814,7 @@ public class PlayerController : MonoBehaviour
             CheckForDashCancelling();
             CheckForAbilities();
 
-            if ((Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S)) && rb.linearVelocityY > 0)
+            if ((Input.GetKey(keybindManager.Down)) && rb.linearVelocityY > 0)
             {
                 rb.linearVelocityY = maxSpeed;
                 currentMovementState = MovementStates.ExitDash;
@@ -816,12 +828,12 @@ public class PlayerController : MonoBehaviour
 
     void CheckForDashCancelling()
     {
-        if (Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D)) //right movement
+        if (Input.GetKey(keybindManager.Right)) //right movement
         {
             direction = 1;
         }
 
-        else if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A)) //left movement
+        else if (Input.GetKey(keybindManager.Left)) //left movement
         {
             direction = -1;
         }
