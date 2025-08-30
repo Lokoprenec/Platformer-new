@@ -216,129 +216,145 @@ public class PlayerController : MonoBehaviour
     {
         if (currentMovementState == MovementStates.Dash || currentMovementState == MovementStates.ExitDash)
         {
-            anim.Play(dashAnimation.ToString());
+            PlayAnimation(dashAnimation.ToString());
             return;
         }
 
         if (isGrounded)
         {
-            isJumping = false;
-            isFalling = false;
+            HandleGroundedAnimations();
+        }
+        else
+        {
+            HandleAirbornAnimations();
+        }
+    }
 
-            landingTimer -= Time.deltaTime;
+    void HandleGroundedAnimations()
+    {
+        isJumping = false;
+        isFalling = false;
 
-            if (transform.localScale.x != direction)
-            {
-                anim.Play(turnTransitionAnimation.ToString());
-                absoluteTurnLockTimer = absoluteTurnLockCooldown;
-                lockTurn = true;
-                return;
-            }
-            else if (lockTurn == true && (absoluteTurnLockTimer > 0 || currentMovementState == MovementStates.Walk))
-            {
-                absoluteTurnLockTimer -= Time.deltaTime;
-                return;
-            }
-            else
-            {
-                lockTurn = false;
+        landingTimer -= Time.deltaTime;
 
-                if (wallSlideDirection == direction && isPressedToAWall && isTryingToRun)
-                {
-                    anim.Play(wallPressAnimation.ToString());
-                    return;
-                }
-                else
-                {
-                    if (currentMovementState == MovementStates.Walk && isTryingToRun)
-                    {
-                        if (inAir)
-                        {
-                            anim.Play(landingRunTransitionAnimation.ToString());
-                            inAir = false;
-                        }
-                        else if (isIdling)
-                        {
-                            anim.Play(runTransitionAnimation.ToString());
-                            isIdling = false;
-                        }
-
-                        return;
-                    }
-                    else if (!isTryingToRun)
-                    {
-                        if (inAir)
-                        {
-                            fallTime = Mathf.Clamp(fallTime, 0, maxFallTime);
-                            landingTimer = (fallTime * landingCooldownMultiplier) + minLandingTime;
-                            anim.Play(landingAnimation.ToString());
-                            fallTime = 0;
-                            inAir = false;
-                        }
-                        else if (landingTimer < 0)
-                        {
-                            anim.Play(idleAnimation.ToString());
-                        }
-
-                        isIdling = true;
-                        return;
-                    }
-                }
-
-                fallTime = 0;
-            }
+        if (transform.localScale.x != direction)
+        {
+            PlayAnimation(turnTransitionAnimation.ToString());
+            absoluteTurnLockTimer = absoluteTurnLockCooldown;
+            lockTurn = true;
+            return;
+        }
+        else if (lockTurn == true && (absoluteTurnLockTimer > 0 || currentMovementState == MovementStates.Walk))
+        {
+            absoluteTurnLockTimer -= Time.deltaTime;
+            return;
         }
         else
         {
             lockTurn = false;
-            inAir = true;
 
-            switch (currentMovementState)
+            if (wallSlideDirection == direction && isPressedToAWall && isTryingToRun)
             {
-                case MovementStates.Jump: // JUMP
-
-                    if (!isJumping)
-                    {
-                        anim.Play(jumpAnimation.ToString());
-                        isJumping = true;
-                        isFalling = false;
-                    }
-
-                    break;
-
-                case MovementStates.Fall: // FALL
-
-                    if (!isFalling)
-                    {
-                        anim.Play(fallAnimation.ToString());
-                        isFalling = true;
-                        isJumping = false;
-                    }
-
-                    fallTime += Time.deltaTime;
-
-                    break;
-
-                case MovementStates.WallSlide: // WALL SLIDE
-
-                    anim.Play(wallSlideAnimation.ToString());
-                    isJumping = false;
-                    isFalling = false;
-
-                    break;
-
-                case MovementStates.WallJump: // WALL JUMP
-
-                    if (!isJumping)
-                    {
-                        anim.Play(wallJumpAnimation.ToString());
-                        isJumping = true;
-                        isFalling = false;
-                    }
-
-                    break;
+                PlayAnimation(wallPressAnimation.ToString());
+                return;
             }
+            else
+            {
+                if (currentMovementState == MovementStates.Walk && isTryingToRun)
+                {
+                    if (inAir)
+                    {
+                        PlayAnimation(landingRunTransitionAnimation.ToString());
+                        inAir = false;
+                    }
+                    else if (isIdling)
+                    {
+                        PlayAnimation(runTransitionAnimation.ToString());
+                        isIdling = false;
+                    }
+
+                    return;
+                }
+                else if (!isTryingToRun)
+                {
+                    if (inAir)
+                    {
+                        fallTime = Mathf.Clamp(fallTime, 0, maxFallTime);
+                        landingTimer = (fallTime * landingCooldownMultiplier) + minLandingTime;
+                        PlayAnimation(landingAnimation.ToString());
+                        fallTime = 0;
+                        inAir = false;
+                    }
+                    else if (landingTimer < 0)
+                    {
+                        PlayAnimation(idleAnimation.ToString());
+                    }
+
+                    isIdling = true;
+                    return;
+                }
+            }
+
+            fallTime = 0;
         }
+    }
+
+    void HandleAirbornAnimations()
+    {
+        lockTurn = false;
+        inAir = true;
+
+        switch (currentMovementState)
+        {
+            case MovementStates.Jump: // JUMP
+
+                if (!isJumping)
+                {
+                    PlayAnimation(jumpAnimation.ToString());
+                    isJumping = true;
+                    isFalling = false;
+                }
+
+                break;
+
+            case MovementStates.Fall: // FALL
+
+                if (!isFalling)
+                {
+                    PlayAnimation(fallAnimation.ToString());
+                    isFalling = true;
+                    isJumping = false;
+                }
+
+                fallTime += Time.deltaTime;
+
+                break;
+
+            case MovementStates.WallSlide: // WALL SLIDE
+
+                PlayAnimation(wallSlideAnimation.ToString());
+                isJumping = false;
+                isFalling = false;
+
+                break;
+
+            case MovementStates.WallJump: // WALL JUMP
+
+                if (!isJumping)
+                {
+                    PlayAnimation(wallJumpAnimation.ToString());
+                    isJumping = true;
+                    isFalling = false;
+                }
+
+                break;
+        }
+    }
+
+    void PlayAnimation(string animName)
+    {
+        if (!anim.GetCurrentAnimatorStateInfo(0).IsName(animName))
+            anim.Play(animName);
     }
 
     #endregion
