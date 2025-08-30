@@ -34,11 +34,19 @@ public class PlayerController : MonoBehaviour
     public PlayerAnimations turnTransitionAnimation;
 
     [Header("Animation variables")]
-    public float landToRunCooldown;
-    private float landToRunTimer;
+    public float landingCooldownMultiplier;
+    public float minLandingTime;
+    private float landingTimer;
     private bool isFalling;
+    public float maxFallTime;
+    private float fallTime;
     private bool isJumping;
     private bool isTryingToRun;
+    private bool inAir;
+    private bool isIdling;
+    private bool lockTurn;
+    public float absoluteTurnLockCooldown;
+    private float absoluteTurnLockTimer;
 
     [Header("Effects")]
     public TrailRenderer trail;
@@ -200,9 +208,8 @@ public class PlayerController : MonoBehaviour
 
     void GraphicHandling()
     {
-        transform.localScale = new Vector2(direction, transform.localScale.y);
-
         AnimationHandling();
+        transform.localScale = new Vector2(direction, transform.localScale.y);
     }
 
     void AnimationHandling()
@@ -218,33 +225,73 @@ public class PlayerController : MonoBehaviour
             isJumping = false;
             isFalling = false;
 
-            if (wallSlideDirection == direction && isPressedToAWall && isTryingToRun)
+            landingTimer -= Time.deltaTime;
+
+            if (transform.localScale.x != direction)
             {
-                anim.Play(wallPressAnimation.ToString());
+                anim.Play(turnTransitionAnimation.ToString());
+                absoluteTurnLockTimer = absoluteTurnLockCooldown;
+                lockTurn = true;
+                return;
+            }
+            else if (lockTurn == true && (absoluteTurnLockTimer > 0 || currentMovementState == MovementStates.Walk))
+            {
+                absoluteTurnLockTimer -= Time.deltaTime;
                 return;
             }
             else
             {
-                if (currentMovementState == MovementStates.Walk && isTryingToRun)
+                lockTurn = false;
+
+                if (wallSlideDirection == direction && isPressedToAWall && isTryingToRun)
                 {
-                    landToRunTimer -= Time.deltaTime;
-
-                    if (landToRunTimer < 0)
-                    {
-                        anim.Play(runAnimation.ToString());
-                    }
-
+                    anim.Play(wallPressAnimation.ToString());
                     return;
                 }
-                else if (!isTryingToRun)
+                else
                 {
-                    anim.Play(idleAnimation.ToString());
+                    if (currentMovementState == MovementStates.Walk && isTryingToRun)
+                    {
+                        if (inAir)
+                        {
+                            anim.Play(landingRunTransitionAnimation.ToString());
+                            inAir = false;
+                        }
+                        else if (isIdling)
+                        {
+                            anim.Play(runTransitionAnimation.ToString());
+                            isIdling = false;
+                        }
+
+                        return;
+                    }
+                    else if (!isTryingToRun)
+                    {
+                        if (inAir)
+                        {
+                            fallTime = Mathf.Clamp(fallTime, 0, maxFallTime);
+                            landingTimer = (fallTime * landingCooldownMultiplier) + minLandingTime;
+                            anim.Play(landingAnimation.ToString());
+                            fallTime = 0;
+                            inAir = false;
+                        }
+                        else if (landingTimer < 0)
+                        {
+                            anim.Play(idleAnimation.ToString());
+                        }
+
+                        isIdling = true;
+                        return;
+                    }
                 }
+
+                fallTime = 0;
             }
         }
         else
         {
-            landToRunTimer = landToRunCooldown;
+            lockTurn = false;
+            inAir = true;
 
             switch (currentMovementState)
             {
@@ -267,6 +314,8 @@ public class PlayerController : MonoBehaviour
                         isFalling = true;
                         isJumping = false;
                     }
+
+                    fallTime += Time.deltaTime;
 
                     break;
 

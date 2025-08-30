@@ -2952,7 +2952,10 @@ MonoBehaviour:
   runTransitionAnimation: 9
   landingRunTransitionAnimation: 11
   turnTransitionAnimation: 10
-  landToRunCooldown: 0.03
+  landingCooldownMultiplier: 0.075
+  minLandingTime: 0.05
+  maxFallTime: 4
+  absoluteTurnLockCooldown: 0.125
   trail: {fileID: 9186109909372338938}
   direction: 1
   acceleration: 60
