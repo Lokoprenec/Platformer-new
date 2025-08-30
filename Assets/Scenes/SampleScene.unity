@@ -2949,6 +2949,10 @@ MonoBehaviour:
   wallSlideAnimation: 5
   wallJumpAnimation: 4
   wallPressAnimation: 8
+  runTransitionAnimation: 9
+  landingRunTransitionAnimation: 11
+  turnTransitionAnimation: 10
+  landToRunCooldown: 0.03
   trail: {fileID: 9186109909372338938}
   direction: 1
   acceleration: 60

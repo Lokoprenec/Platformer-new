@@ -29,8 +29,13 @@ public class PlayerController : MonoBehaviour
     public PlayerAnimations wallSlideAnimation;
     public PlayerAnimations wallJumpAnimation;
     public PlayerAnimations wallPressAnimation;
+    public PlayerAnimations runTransitionAnimation;
+    public PlayerAnimations landingRunTransitionAnimation;
+    public PlayerAnimations turnTransitionAnimation;
 
     [Header("Animation variables")]
+    public float landToRunCooldown;
+    private float landToRunTimer;
     private bool isFalling;
     private bool isJumping;
     private bool isTryingToRun;
@@ -222,18 +227,25 @@ public class PlayerController : MonoBehaviour
             {
                 if (currentMovementState == MovementStates.Walk && isTryingToRun)
                 {
-                    anim.Play(runAnimation.ToString());
+                    landToRunTimer -= Time.deltaTime;
+
+                    if (landToRunTimer < 0)
+                    {
+                        anim.Play(runAnimation.ToString());
+                    }
+
                     return;
                 }
-                else
+                else if (!isTryingToRun)
                 {
                     anim.Play(idleAnimation.ToString());
-                    return;
                 }
             }
         }
         else
         {
+            landToRunTimer = landToRunCooldown;
+
             switch (currentMovementState)
             {
                 case MovementStates.Jump: // JUMP
@@ -835,7 +847,8 @@ public enum PlayerAnimations
     testRunSketch, runSketch, 
     jumpStartSketch, jumpEndSketch, 
     fallStartSketch, fallEndSketch, 
-    landingSketch
+    landingSketch, runTransitionSketch,
+    turnTransitionSketch, landingRunTransitionSketch
 }
 
 #endregion
