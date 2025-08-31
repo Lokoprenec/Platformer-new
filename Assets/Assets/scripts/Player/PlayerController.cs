@@ -86,7 +86,8 @@ public class PlayerController : MonoBehaviour
     public bool bashEnabled;
     public float bashDetectionRangeX;
     public float bashDetectionRangeY;
-    public float launchVelocity;
+    public float baseLaunchVelocity;
+    public float launchVelocityDivider;
     public float bashLockTime;
     private float bashLockTimer;
     public float bashGravity;
@@ -108,13 +109,17 @@ public class PlayerController : MonoBehaviour
     private Vector2 wallJumpDirection;
     public float wallJumpLockTime;
     private float wallJumpLockTimer;
-    public float wallJumpHorizontalForce;
-    public float wallJumpVerticalForce;
     public float wallJumpBuffer;
     private float wallJumpBufferCounter;
     public float wallJumpCoyoteTime;
     private float wallJumpCoyoteTimeCounter;
     public float maxWallSlideSpeed;
+    public float wallJumpPreparationHorizontalForce;
+    public float wallJumpPreparationVerticalForce;
+    public float wallJumpHorizontalForce;
+    public float wallJumpVerticalForce;
+    public float wallLeapHorizontalForce;
+    public float wallLeapVerticalForce;
 
     #endregion
 
@@ -759,7 +764,13 @@ public class PlayerController : MonoBehaviour
         bashDir = new Vector2(x, y);
 
         if (bashDir == Vector2.zero)
+        {
             bashDir = Vector2.up;
+        }
+        else if (bashDir.x != 0 && bashDir.y != 0)
+        {
+            bashDir *= launchVelocityDivider;
+        }
     }
 
     void CheckForDashChaining()
@@ -805,7 +816,7 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            rb.linearVelocity = launchVelocity * bashDir;
+            rb.linearVelocity = baseLaunchVelocity * bashDir;
             bashTimer -= Time.deltaTime;
         }
 
@@ -893,15 +904,61 @@ public class PlayerController : MonoBehaviour
                 break;
         }
 
-        currentMovementState = MovementStates.WallJump;
         transform.position = new Vector2(transform.position.x + (0.35f * wallJumpDirection.x), transform.position.y);
         wallJumpLockTimer = wallJumpLockTime;
-        rb.linearVelocityY = wallJumpVerticalForce;
-        rb.linearVelocityX = wallJumpDirection.x * wallJumpHorizontalForce;
+        currentMovementState = MovementStates.WallJump;
+        rb.linearVelocityY = wallJumpPreparationVerticalForce;
+        rb.linearVelocityX = wallJumpDirection.x * wallJumpPreparationHorizontalForce;
         rb.gravityScale = initialGravity;
         wallJumpBufferCounter = 0;
         jumpBufferCounter = 0;
         coyoteTimeCounter = 0;
+
+        Invoke("CheckForJumpForm", 0.1f);
+    }
+
+    void CheckForJumpForm()
+    {
+        switch (wallJumpDirection.x)
+        {
+            case 1:
+
+                if (Input.GetKey(keybindManager.Right))
+                {
+                    LeapFromWall();
+                }
+                else
+                {
+                    JumpUpTheWall();
+                }
+
+                break;
+
+            case -1:
+
+                if (Input.GetKey(keybindManager.Left))
+                {
+                    LeapFromWall();
+                }
+                else
+                {
+                    JumpUpTheWall();
+                }
+
+                break;
+        }
+    }
+
+    void LeapFromWall()
+    {
+        rb.linearVelocityY = wallLeapVerticalForce;
+        rb.linearVelocityX = wallJumpDirection.x * wallLeapHorizontalForce;
+    }
+
+    void JumpUpTheWall()
+    {
+        rb.linearVelocityY = wallJumpVerticalForce;
+        rb.linearVelocityX = wallJumpDirection.x * wallJumpHorizontalForce;
     }
 
     #endregion
