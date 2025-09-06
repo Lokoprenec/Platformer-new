@@ -982,7 +982,8 @@ public enum PlayerAnimations
     jumpStartSketch, jumpEndSketch, 
     fallStartSketch, fallEndSketch, 
     landingSketch, runTransitionSketch,
-    turnTransitionSketch, landingRunTransitionSketch
+    turnTransitionSketch, landingRunTransitionSketch,
+    wallPressSketch
 }
 
 #endregion
