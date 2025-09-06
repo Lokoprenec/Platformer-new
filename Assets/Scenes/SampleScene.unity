@@ -4883,7 +4883,8 @@ MonoBehaviour:
   jumpAnimation: 4
   fallAnimation: 6
   landingAnimation: 8
-  dashAnimation: 4
+  upBashAnimation: 13
+  upBashToFallTransitionAnimation: 14
   wallSlideAnimation: 5
   wallJumpAnimation: 4
   wallPressAnimation: 12

@@ -27,7 +27,8 @@ public class PlayerController : MonoBehaviour
     public PlayerAnimations jumpAnimation;
     public PlayerAnimations fallAnimation;
     public PlayerAnimations landingAnimation;
-    public PlayerAnimations dashAnimation;
+    public PlayerAnimations upBashAnimation;
+    public PlayerAnimations upBashToFallTransitionAnimation;
     public PlayerAnimations wallSlideAnimation;
     public PlayerAnimations wallJumpAnimation;
     public PlayerAnimations wallPressAnimation;
@@ -49,6 +50,7 @@ public class PlayerController : MonoBehaviour
     private bool lockTurn;
     public float absoluteTurnLockCooldown;
     private float absoluteTurnLockTimer;
+    private bool isBashing;
 
     [Header("Effects")]
     public TrailRenderer trail;
@@ -230,7 +232,11 @@ public class PlayerController : MonoBehaviour
     {
         if (currentMovementState == MovementStates.Dash || currentMovementState == MovementStates.ExitDash)
         {
-            PlayAnimation(dashAnimation.ToString());
+            PlayAnimation(upBashAnimation.ToString());
+            isBashing = true;
+            isJumping = false;
+            isFalling = false;
+            fallTime = 0;
             return;
         }
 
@@ -246,6 +252,7 @@ public class PlayerController : MonoBehaviour
 
     void HandleGroundedAnimations()
     {
+        isBashing = false;
         isJumping = false;
         isFalling = false;
 
@@ -335,6 +342,15 @@ public class PlayerController : MonoBehaviour
 
                 if (!isFalling)
                 {
+                    if (isBashing)
+                    {
+                        PlayAnimation(upBashToFallTransitionAnimation.ToString());
+                        isBashing = false;
+                        isFalling = true;
+                        isJumping = false;
+                        return;
+                    }
+
                     PlayAnimation(fallAnimation.ToString());
                     isFalling = true;
                     isJumping = false;
@@ -363,6 +379,8 @@ public class PlayerController : MonoBehaviour
 
                 break;
         }
+
+        isBashing = false;
     }
 
     void PlayAnimation(string animName)
@@ -977,13 +995,15 @@ public enum MovementStates
 
 public enum PlayerAnimations
 {
+    // SKETCH ANIMATIONS
     staticIdleSketch, idleSketch, 
     testRunSketch, runSketch, 
     jumpStartSketch, jumpEndSketch, 
     fallStartSketch, fallEndSketch, 
     landingSketch, runTransitionSketch,
     turnTransitionSketch, landingRunTransitionSketch,
-    wallPressSketch
+    wallPressSketch, upBashSketch,
+    upBashToFallTransitionSketch
 }
 
 #endregion
