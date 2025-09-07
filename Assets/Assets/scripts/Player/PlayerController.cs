@@ -29,6 +29,11 @@ public class PlayerController : MonoBehaviour
     public PlayerAnimations landingAnimation;
     public PlayerAnimations upBashAnimation;
     public PlayerAnimations upBashToFallTransitionAnimation;
+    public PlayerAnimations sideBashAnimation;
+    public PlayerAnimations sideBashFlipAnimation;
+    public PlayerAnimations sideBashToFallTransitionAnimation;
+    public PlayerAnimations diagonalUpBashAnimation;
+    public PlayerAnimations diagonalDownBashAnimation;
     public PlayerAnimations wallSlideAnimation;
     public PlayerAnimations wallJumpAnimation;
     public PlayerAnimations wallPressAnimation;
@@ -51,6 +56,7 @@ public class PlayerController : MonoBehaviour
     public float absoluteTurnLockCooldown;
     private float absoluteTurnLockTimer;
     private bool isBashing;
+    private string bashType;
 
     [Header("Effects")]
     public TrailRenderer trail;
@@ -232,7 +238,7 @@ public class PlayerController : MonoBehaviour
     {
         if (currentMovementState == MovementStates.Dash || currentMovementState == MovementStates.ExitDash)
         {
-            PlayAnimation(upBashAnimation.ToString());
+            DetermineBashType();
             isBashing = true;
             isJumping = false;
             isFalling = false;
@@ -247,6 +253,47 @@ public class PlayerController : MonoBehaviour
         else
         {
             HandleAirbornAnimations();
+        }
+    }
+
+    void DetermineBashType()
+    {
+        if (bashDir.x != 0)
+        {
+            if (currentMovementState == MovementStates.ExitDash || bashLockTimer < 0)
+            {
+                PlayAnimation(sideBashFlipAnimation.ToString());
+            }
+            else
+            {
+                switch (bashDir.y)
+                {
+                    case 1:
+
+                        PlayAnimation(diagonalUpBashAnimation.ToString());
+
+                        break;
+
+                    case 0:
+
+                        PlayAnimation(sideBashAnimation.ToString());
+
+                        break;
+
+                    case -1:
+
+                        PlayAnimation(diagonalDownBashAnimation.ToString());
+
+                        break;
+                }
+            }
+
+            bashType = "sideBash";
+        }
+        else
+        {
+            PlayAnimation(upBashAnimation.ToString());
+            bashType = "upBash";
         }
     }
 
@@ -344,7 +391,15 @@ public class PlayerController : MonoBehaviour
                 {
                     if (isBashing)
                     {
-                        PlayAnimation(upBashToFallTransitionAnimation.ToString());
+                        if (bashType == "sideBash")
+                        {
+                            PlayAnimation(sideBashToFallTransitionAnimation.ToString());
+                        }
+                        else if (bashType == "upBash")
+                        {
+                            PlayAnimation(upBashToFallTransitionAnimation.ToString());
+                        }
+
                         isBashing = false;
                         isFalling = true;
                         isJumping = false;
@@ -1003,7 +1058,9 @@ public enum PlayerAnimations
     landingSketch, runTransitionSketch,
     turnTransitionSketch, landingRunTransitionSketch,
     wallPressSketch, upBashSketch,
-    upBashToFallTransitionSketch
+    upBashToFallTransitionSketch, sideBashSketch,
+    sideBashToFallTransitionSketch, sideBashFlipSketch,
+    diagonalUpBashSketch, diagonalDownBashSketch
 }
 
 #endregion

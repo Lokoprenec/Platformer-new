@@ -4885,6 +4885,11 @@ MonoBehaviour:
   landingAnimation: 8
   upBashAnimation: 13
   upBashToFallTransitionAnimation: 14
+  sideBashAnimation: 15
+  sideBashFlipAnimation: 17
+  sideBashToFallTransitionAnimation: 16
+  diagonalUpBashAnimation: 18
+  diagonalDownBashAnimation: 19
   wallSlideAnimation: 5
   wallJumpAnimation: 4
   wallPressAnimation: 12
