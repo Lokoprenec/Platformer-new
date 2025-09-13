@@ -57,6 +57,7 @@ public class PlayerController : MonoBehaviour
     private float absoluteTurnLockTimer;
     private bool isBashing;
     private string bashType;
+    public float bonusBashLockTime;
 
     [Header("Effects")]
     public TrailRenderer trail;
@@ -106,6 +107,7 @@ public class PlayerController : MonoBehaviour
     public float exitBashGravity;
     public float bashInputBuffer;
     private float bashInputBufferCounter;
+    public float bashDirectionChangeGrace;
 
     [Header("Wall jump")]
     public bool wallJumpEnabled;
@@ -231,7 +233,23 @@ public class PlayerController : MonoBehaviour
     void GraphicHandling()
     {
         AnimationHandling();
-        transform.localScale = new Vector2(direction, transform.localScale.y);
+
+        if (currentMovementState == MovementStates.Dash && bashDir.x != 0)
+        {
+            if (bashDir.y != 0)
+            {
+                Vector2 fixedBashDir = bashDir / launchVelocityDivider;
+                transform.localScale = new Vector2(fixedBashDir.x, transform.localScale.y);
+            }
+            else
+            {
+                transform.localScale = new Vector2(bashDir.x, transform.localScale.y);
+            }
+        }
+        else
+        {
+            transform.localScale = new Vector2(direction, transform.localScale.y);
+        }
     }
 
     void AnimationHandling()
@@ -260,13 +278,16 @@ public class PlayerController : MonoBehaviour
     {
         if (bashDir.x != 0)
         {
-            if (currentMovementState == MovementStates.ExitDash || bashLockTimer < 0)
+            if (currentMovementState == MovementStates.ExitDash || bashLockTimer < -bonusBashLockTime)
             {
                 PlayAnimation(sideBashFlipAnimation.ToString());
             }
             else
             {
-                switch (bashDir.y)
+                Vector2 fixedBashDir = bashDir / launchVelocityDivider;
+                int yDir = Mathf.RoundToInt(fixedBashDir.y);
+
+                switch (yDir)
                 {
                     case 1:
 
@@ -830,6 +851,13 @@ public class PlayerController : MonoBehaviour
         bashLockTimer = bashLockTime;
         bashTimer = bashTime;
 
+        SetBashDirection();
+
+        Invoke("SetBashDirection", bashDirectionChangeGrace);
+    }
+
+    void SetBashDirection()
+    {
         // Use helper
         int x = GetAxis(keybindManager.Left, keybindManager.Right);
         int y = GetAxis(keybindManager.Down, keybindManager.Up);
@@ -953,6 +981,7 @@ public class PlayerController : MonoBehaviour
         wallJumpCoyoteTimeCounter = wallJumpCoyoteTime;
         rb.gravityScale = wallSlideGravity;
         rb.linearVelocityY = Mathf.Clamp(rb.linearVelocityY, -maxWallSlideSpeed, 0); //can't slide faster than max
+        rb.linearVelocityX = 0;
 
         if (!isPressedToAWall || wallSlideDirection != direction)
         {

@@ -4899,7 +4899,8 @@ MonoBehaviour:
   landingCooldownMultiplier: 0.08
   minLandingTime: 0.05
   maxFallTime: 4
-  absoluteTurnLockCooldown: 0.125
+  absoluteTurnLockCooldown: 0.1
+  bonusBashLockTime: 0.001
   trail: {fileID: 9186109909372338938}
   direction: 1
   acceleration: 60
@@ -4920,8 +4921,8 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 8
-  coyoteTime: 0.125
-  jumpBufferTime: 0.125
+  coyoteTime: 0.1
+  jumpBufferTime: 0.1
   bashEnabled: 1
   bashDetectionRangeX: 4
   bashDetectionRangeY: 1.6
@@ -4934,16 +4935,17 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   exitBashGravity: 10
-  bashInputBuffer: 0.125
+  bashInputBuffer: 0.1
+  bashDirectionChangeGrace: 0.025
   wallJumpEnabled: 1
   isPressedToAWall: 0
   wallSlideGravity: 1.25
   wallSlideDirection: 0
   wallSlideSetDirection: 0
   minWallSlideVelocity: -3
-  wallJumpLockTime: 0.125
-  wallJumpBuffer: 0.125
-  wallJumpCoyoteTime: 0.125
+  wallJumpLockTime: 0.1
+  wallJumpBuffer: 0.1
+  wallJumpCoyoteTime: 0.1
   maxWallSlideSpeed: 20
   wallJumpPreparationHorizontalForce: 6
   wallJumpPreparationVerticalForce: 10
