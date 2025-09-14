@@ -4890,7 +4890,8 @@ MonoBehaviour:
   sideBashToFallTransitionAnimation: 16
   diagonalUpBashAnimation: 18
   diagonalDownBashAnimation: 19
-  wallSlideAnimation: 5
+  wallSlideStartAnimation: 20
+  wallSlideEndAnimation: 21
   wallJumpAnimation: 4
   wallPressAnimation: 12
   runTransitionAnimation: 9
@@ -4901,6 +4902,7 @@ MonoBehaviour:
   maxFallTime: 4
   absoluteTurnLockCooldown: 0.1
   bonusBashLockTime: 0.001
+  wallSlideAnimationSwitchVelocityThreshold: -7
   trail: {fileID: 9186109909372338938}
   direction: 1
   acceleration: 60

@@ -34,7 +34,8 @@ public class PlayerController : MonoBehaviour
     public PlayerAnimations sideBashToFallTransitionAnimation;
     public PlayerAnimations diagonalUpBashAnimation;
     public PlayerAnimations diagonalDownBashAnimation;
-    public PlayerAnimations wallSlideAnimation;
+    public PlayerAnimations wallSlideStartAnimation;
+    public PlayerAnimations wallSlideEndAnimation;
     public PlayerAnimations wallJumpAnimation;
     public PlayerAnimations wallPressAnimation;
     public PlayerAnimations runTransitionAnimation;
@@ -58,6 +59,7 @@ public class PlayerController : MonoBehaviour
     private bool isBashing;
     private string bashType;
     public float bonusBashLockTime;
+    public float wallSlideAnimationSwitchVelocityThreshold;
 
     [Header("Effects")]
     public TrailRenderer trail;
@@ -438,7 +440,15 @@ public class PlayerController : MonoBehaviour
 
             case MovementStates.WallSlide: // WALL SLIDE
 
-                PlayAnimation(wallSlideAnimation.ToString());
+                if (rb.linearVelocityY < wallSlideAnimationSwitchVelocityThreshold)
+                {
+                    PlayAnimation(wallSlideEndAnimation.ToString());
+                }
+                else
+                {
+                    PlayAnimation(wallSlideStartAnimation.ToString());
+                }
+
                 isJumping = false;
                 isFalling = false;
 
@@ -1089,7 +1099,8 @@ public enum PlayerAnimations
     wallPressSketch, upBashSketch,
     upBashToFallTransitionSketch, sideBashSketch,
     sideBashToFallTransitionSketch, sideBashFlipSketch,
-    diagonalUpBashSketch, diagonalDownBashSketch
+    diagonalUpBashSketch, diagonalDownBashSketch,
+    wallSlideStartSketch, wallSlideEndSketch
 }
 
 #endregion
