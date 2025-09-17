@@ -1,4 +1,7 @@
 using UnityEngine;
+using System;
+using System.Collections.Generic;
+using System.Collections;
 
 public class PlayerController : MonoBehaviour
 {
@@ -126,12 +129,12 @@ public class PlayerController : MonoBehaviour
     public float wallJumpCoyoteTime;
     private float wallJumpCoyoteTimeCounter;
     public float maxWallSlideSpeed;
-    public float wallJumpPreparationHorizontalForce;
-    public float wallJumpPreparationVerticalForce;
     public float wallJumpHorizontalForce;
     public float wallJumpVerticalForce;
     public float wallLeapHorizontalForce;
     public float wallLeapVerticalForce;
+    public float wallFlipHorizontalForce;
+    public float wallFlipVerticalForce;
 
     #endregion
 
@@ -449,6 +452,7 @@ public class PlayerController : MonoBehaviour
                     PlayAnimation(wallSlideStartAnimation.ToString());
                 }
 
+                fallTime = 0;
                 isJumping = false;
                 isFalling = false;
 
@@ -459,6 +463,7 @@ public class PlayerController : MonoBehaviour
                 if (!isJumping)
                 {
                     PlayAnimation(wallJumpAnimation.ToString());
+                    fallTime = 0;
                     isJumping = true;
                     isFalling = false;
                 }
@@ -1019,8 +1024,8 @@ public class PlayerController : MonoBehaviour
         transform.position = new Vector2(transform.position.x + (0.35f * wallJumpDirection.x), transform.position.y);
         wallJumpLockTimer = wallJumpLockTime;
         currentMovementState = MovementStates.WallJump;
-        rb.linearVelocityY = wallJumpPreparationVerticalForce;
-        rb.linearVelocityX = wallJumpDirection.x * wallJumpPreparationHorizontalForce;
+        rb.linearVelocityY = wallJumpVerticalForce;
+        rb.linearVelocityX = wallJumpDirection.x * wallJumpHorizontalForce;
         rb.gravityScale = initialGravity;
         wallJumpBufferCounter = 0;
         jumpBufferCounter = 0;
@@ -1039,10 +1044,6 @@ public class PlayerController : MonoBehaviour
                 {
                     LeapFromWall();
                 }
-                else
-                {
-                    JumpUpTheWall();
-                }
 
                 break;
 
@@ -1052,10 +1053,6 @@ public class PlayerController : MonoBehaviour
                 {
                     LeapFromWall();
                 }
-                else
-                {
-                    JumpUpTheWall();
-                }
 
                 break;
         }
@@ -1063,14 +1060,35 @@ public class PlayerController : MonoBehaviour
 
     void LeapFromWall()
     {
-        rb.linearVelocityY = wallLeapVerticalForce;
-        rb.linearVelocityX = wallJumpDirection.x * wallLeapHorizontalForce;
+        Debug.Log("leap from wall");
+        wallJumpLockTimer = wallJumpLockTime;
+
+        StartCoroutine(JumpToLeapVelocityTransition(
+            wallJumpDirection.x * wallLeapHorizontalForce,
+            wallLeapVerticalForce,
+            0.4f // transition duration in seconds
+        ));
     }
 
-    void JumpUpTheWall()
+    IEnumerator JumpToLeapVelocityTransition(float targetXVelocity, float targetYVelocity, float duration)
     {
-        rb.linearVelocityY = wallJumpVerticalForce;
-        rb.linearVelocityX = wallJumpDirection.x * wallJumpHorizontalForce;
+        float elapsed = 0f;
+        Vector2 startVelocity = rb.linearVelocity;
+        Vector2 targetVelocity = new Vector2(targetXVelocity, targetYVelocity);
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / duration;
+
+            // Ease-out cubic: starts fast, slows down as it approaches target
+            t = 1f - Mathf.Pow(1f - t, 3);
+
+            rb.linearVelocity = Vector2.Lerp(startVelocity, targetVelocity, t);
+            yield return null;
+        }
+
+        rb.linearVelocity = targetVelocity; // snap to final value
     }
 
     #endregion
@@ -1100,7 +1118,8 @@ public enum PlayerAnimations
     upBashToFallTransitionSketch, sideBashSketch,
     sideBashToFallTransitionSketch, sideBashFlipSketch,
     diagonalUpBashSketch, diagonalDownBashSketch,
-    wallSlideStartSketch, wallSlideEndSketch
+    wallSlideStartSketch, wallSlideEndSketch,
+    wallLeapSketch
 }
 
 #endregion

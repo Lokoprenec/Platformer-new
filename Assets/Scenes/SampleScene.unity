@@ -4892,7 +4892,7 @@ MonoBehaviour:
   diagonalDownBashAnimation: 19
   wallSlideStartAnimation: 20
   wallSlideEndAnimation: 21
-  wallJumpAnimation: 4
+  wallJumpAnimation: 22
   wallPressAnimation: 12
   runTransitionAnimation: 9
   landingRunTransitionAnimation: 11
@@ -4949,12 +4949,12 @@ MonoBehaviour:
   wallJumpBuffer: 0.1
   wallJumpCoyoteTime: 0.1
   maxWallSlideSpeed: 20
-  wallJumpPreparationHorizontalForce: 6
-  wallJumpPreparationVerticalForce: 10
   wallJumpHorizontalForce: 4
-  wallJumpVerticalForce: 15
-  wallLeapHorizontalForce: 22
-  wallLeapVerticalForce: 20
+  wallJumpVerticalForce: 18
+  wallLeapHorizontalForce: 12
+  wallLeapVerticalForce: 8
+  wallFlipHorizontalForce: 20
+  wallFlipVerticalForce: 10
 --- !u!1 &9198683796826355039
 GameObject:
   m_ObjectHideFlags: 0
