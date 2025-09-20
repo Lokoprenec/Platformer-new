@@ -10,4 +10,5 @@ public class KeybindManager : MonoBehaviour
     public KeyCode Down;
     public KeyCode Jump;
     public KeyCode Bash;
+    public KeyCode Attack;
 }

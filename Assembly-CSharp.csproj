@@ -63,6 +63,9 @@
   <ItemGroup>
     <Compile Include="Assets\Assets\scripts\Other\KeybindManager.cs" />
     <Compile Include="Assets\Assets\scripts\AI\Pathfinding\PriorityQueue.cs" />
+    <Compile Include="Assets\Assets\scripts\AI\Damage Info\DamageInfo.cs" />
+    <Compile Include="Assets\Assets\scripts\AI\Enemy behaviours\EnemyManager.cs" />
+    <Compile Include="Assets\Assets\scripts\Player\PlayerSlashManager.cs" />
     <Compile Include="Assets\Assets\scripts\AI\Pathfinding\NodeDefinitionClass.cs" />
     <Compile Include="Assets\Assets\scripts\AI\SurvivorManager.cs" />
     <Compile Include="Assets\Assets\scripts\Other\ItemGenerator.cs" />
@@ -73,6 +76,7 @@
     <Compile Include="Assets\Assets\scripts\Other\ObjectPooling.cs" />
     <Compile Include="Assets\Assets\scripts\AI\Pathfinding\Pathfinder.cs" />
     <Compile Include="Assets\Assets\scripts\AI\SurroundingsDatabase.cs" />
+    <Compile Include="Assets\Assets\scripts\AI\Enemy behaviours\Crawler behaviour.cs" />
     <Compile Include="Assets\Assets\scripts\Player\PlayerManager.cs" />
     <Compile Include="Assets\Assets\scripts\AI\Pathfinding\NodeCreator.cs" />
   </ItemGroup>

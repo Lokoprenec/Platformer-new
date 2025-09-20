@@ -5,15 +5,24 @@ using UnityEngine.UI;
 public class PlayerManager : MonoBehaviour
 {
     [Header("Health")]
+    private SpriteRenderer sR;
+    private PlayerController pC;
     public GameObject healthBar;
     [SerializeField] private List<Transform> healthBarComponents;
     public Color activeHealth;
     public Color inactiveHealth;
     public float health;
     public float maxHealth;
+    public float invincibilityCooldown;
+    private float invincibilityTimer = 0;
+    public Color regularColor;
+    public Color invincibilityColor;
 
     private void Awake()
     {
+        pC = GetComponent<PlayerController>();
+        sR = pC.graphic.GetComponent<SpriteRenderer>();
+
         foreach (Transform component in healthBar.transform)
         {
             healthBarComponents.Add(component);
@@ -24,17 +33,57 @@ public class PlayerManager : MonoBehaviour
 
     private void Update()
     {
-        if (health <= 0)
+        if (invincibilityTimer >= 0)
         {
-            Death();
+            invincibilityTimer -= Time.deltaTime;
+        }
+        else
+        {
+            sR.color = regularColor;
         }
 
         UpdateBar(healthBarComponents, activeHealth, inactiveHealth, health, maxHealth);
+
+        if (pC.knockbackedStunTimer < 0)
+        {
+            CheckForDeath();
+        }
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    private void OnTriggerStay2D(Collider2D collision)
     {
-        if (collision.gameObject.CompareTag("death"))
+        if (invincibilityTimer < 0)
+        {
+            invincibilityTimer = invincibilityCooldown;
+
+            if (collision.gameObject.CompareTag("hazard"))
+            {
+                Death();
+            }
+            else if (collision.gameObject.CompareTag("contact damage"))
+            {
+                health -= collision.gameObject.GetComponent<DamageInfo>().contactDamage;
+            }
+
+            if (collision.transform.position.x < transform.position.x)
+            {
+                pC.knockbackedXDir = 1;
+            }
+            else
+            {
+                pC.knockbackedXDir = -1;
+            }
+
+            pC.knockbackedStunTimer = pC.knockbackedStun;
+            pC.knockbackedTimer = pC.knockbackedCooldown;
+            pC.currentMovementState = MovementStates.Knockbacked;
+            sR.color = invincibilityColor;
+        }
+    }
+
+    public void CheckForDeath()
+    {
+        if (health <= 0)
         {
             Death();
         }
@@ -42,13 +91,15 @@ public class PlayerManager : MonoBehaviour
 
     public void Death()
     {
-        transform.position = new Vector2(-12.69f, 6.56f);
         Respawn();
     }
 
     public void Respawn()
     {
+        transform.position = new Vector2(-12.69f, 6.56f);
         health = maxHealth;
+        pC.currentMovementState = MovementStates.Idle;
+        sR.color = regularColor;
     }
 
     public void UpdateBar(List<Transform> list, Color active, Color inactive, float value, float maxValue)
@@ -57,11 +108,11 @@ public class PlayerManager : MonoBehaviour
         {
             Image image = list[i].GetComponent<Image>();
             
-            if ((i / 2) < maxValue)
+            if (i < maxValue)
             {
                 list[i].gameObject.SetActive(true);
 
-                if (((i + 0.02f) / 2) > value)
+                if (i >= value)
                 {
                     image.color = inactive;
                 }

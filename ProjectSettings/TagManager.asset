@@ -4,6 +4,9 @@
 TagManager:
   serializedVersion: 3
   tags:
+  - check
+  - hazard
+  - contact damage
   - death
   layers:
   - Default
@@ -13,10 +16,10 @@ TagManager:
   - Water
   - UI
   - bashTarget
-  - 
-  - 
-  - 
-  - 
+  - enemies
+  - player
+  - hurtzone
+  - player attack
   - 
   - 
   - 
@@ -39,6 +42,9 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: Attack
+    uniqueID: 659195089
+    locked: 0
   - name: Default
     uniqueID: 0
     locked: 0

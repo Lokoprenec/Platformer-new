@@ -16,8 +16,6 @@ public class PlayerController : MonoBehaviour
 
     public KeybindManager keybindManager;
 
-    public MovementStates currentMovementState;
-
     [Header("Visuals")]
 
     [Header("Essentials")]
@@ -44,6 +42,7 @@ public class PlayerController : MonoBehaviour
     public PlayerAnimations runTransitionAnimation;
     public PlayerAnimations landingRunTransitionAnimation;
     public PlayerAnimations turnTransitionAnimation;
+    public PlayerAnimations knockbackedAnimation;
 
     [Header("Animation variables")]
     public float landingCooldownMultiplier;
@@ -68,6 +67,8 @@ public class PlayerController : MonoBehaviour
     public TrailRenderer trail;
 
     [Header("Movement")]
+
+    public MovementStates currentMovementState;
 
     [Header("Horizontal movement")] //acceleration - max speed - deceleration - quick turn
     public float direction;
@@ -136,6 +137,33 @@ public class PlayerController : MonoBehaviour
     public float wallFlipHorizontalForce;
     public float wallFlipVerticalForce;
 
+    [Header("Knockback stun")]
+    public float knockbackedHorizontalForce;
+    public float knockbackedVerticalForce;
+    public float knockbackedCooldown;
+    public float knockbackedTimer;
+    public float knockbackedStun;
+    public float knockbackedStunTimer;
+    public int knockbackedXDir;
+
+    [Header("Attack pushback")]
+    public float attackPushbackForce;
+    public float attackPushbackCooldown;
+    private float attackPushbackTimer;
+    private float attackPushbackDirection;
+
+    [Header("Combat")]
+
+    public CombatStates currentCombatState;
+    public AttackTypes currentAttackType;
+    public float attackInputBuffer;
+    private float attackInputBufferTimer;
+    private bool attackCancel;
+    private float prevDirection;
+
+    [Header("Melee")]
+    public PlayerSlashManager meleeWeapon;
+
     #endregion
 
     #region BuiltInEngineVoids
@@ -148,12 +176,14 @@ public class PlayerController : MonoBehaviour
         pM = GetComponent<PlayerManager>();
         anim = graphic.GetComponent<Animator>();
         trail.emitting = false;
+        attackPushbackTimer = attackPushbackCooldown;
     }
 
     // Update is called once per frame
     void Update()
     {
-        StateMachineHandling();
+        MovementStateMachineHandling();
+        CombatStateMachineHandling();
         FunctionalityHandling();
         GraphicHandling();
     }
@@ -220,6 +250,13 @@ public class PlayerController : MonoBehaviour
         {
             isTryingToRun = false;
         }
+
+        if (prevDirection != direction && currentCombatState == CombatStates.Attack)
+        {
+            attackCancel = true;
+        }
+
+        prevDirection = direction;
     }
 
     private int GetAxis(KeyCode negative, KeyCode positive)
@@ -259,7 +296,11 @@ public class PlayerController : MonoBehaviour
 
     void AnimationHandling()
     {
-        if (currentMovementState == MovementStates.Dash || currentMovementState == MovementStates.ExitDash)
+        if (currentMovementState == MovementStates.Knockbacked)
+        {
+            PlayAnimation(knockbackedAnimation.ToString());
+        }
+        else if (currentMovementState == MovementStates.Dash || currentMovementState == MovementStates.ExitDash)
         {
             DetermineBashType();
             isBashing = true;
@@ -482,11 +523,11 @@ public class PlayerController : MonoBehaviour
 
     #endregion
 
-    #region StateMachine
+    #region MovementStateMachine
 
-    #region StateMachineHandling
+    #region MovementStateMachineHandling
 
-    void StateMachineHandling()
+    void MovementStateMachineHandling()
     {
         switch (currentMovementState)
         {
@@ -558,6 +599,18 @@ public class PlayerController : MonoBehaviour
                 }
 
                 CheckForAbilities();
+
+                break;
+
+            case MovementStates.Knockbacked: // KNOCKBACKED
+
+                WhileKnockbacked();
+
+                break;
+
+            case MovementStates.AttackPushback: // ATTACK PUSHBACK
+
+                WhilePushedBack();
 
                 break;
         }
@@ -713,7 +766,7 @@ public class PlayerController : MonoBehaviour
 
     #endregion
 
-    #region States
+    #region MovementStates
 
     #region Idle
 
@@ -1093,6 +1146,143 @@ public class PlayerController : MonoBehaviour
 
     #endregion
 
+    #region Knockbacked
+
+    void WhileKnockbacked()
+    {
+        direction = -knockbackedXDir;
+        knockbackedTimer -= Time.deltaTime;
+        knockbackedStunTimer -= Time.deltaTime;
+
+        if (knockbackedTimer > 0)
+        {
+            rb.linearVelocity = new Vector2(knockbackedHorizontalForce * knockbackedXDir, knockbackedVerticalForce);
+        }
+        else
+        {
+            rb.linearVelocityX = 3 * knockbackedXDir;
+            rb.linearVelocityY = -3;
+        }
+
+        if (knockbackedStunTimer < 0)
+        {
+            SetStateToFall();
+        }
+    }
+
+    #endregion
+
+    #region AttackPushback
+
+    void WhilePushedBack()
+    {
+        attackPushbackTimer -= Time.deltaTime;
+        rb.linearVelocityX = attackPushbackForce * attackPushbackDirection;
+
+        if (attackPushbackTimer < 0)
+        {
+            attackPushbackTimer = attackPushbackCooldown;
+            currentMovementState = MovementStates.Idle;
+        }
+    }
+
+    #endregion
+
+    #endregion
+
+    #endregion
+
+    #region CombatStateMachine
+
+    #region CombatStateMachinehandling
+
+    void CombatStateMachineHandling()
+    {
+        switch (currentCombatState)
+        {
+            case CombatStates.Neutral: // NEUTRAL
+
+                meleeWeapon.slashCooldownTimer -= Time.deltaTime;
+
+                CheckForAttack();
+
+                break;
+
+            case CombatStates.Attack: // ATTACK
+
+                switch (currentAttackType)
+                {
+                    case AttackTypes.Melee:
+
+                        if (meleeWeapon.slashCooldownTimer < 0)
+                        {
+                            attackInputBufferTimer = 0;
+                            WhileSlashing();
+                        }
+                        else
+                        {
+                            currentCombatState = CombatStates.Neutral;
+                        }
+
+                        break;
+                }
+
+                break;
+        }
+    }
+
+    #endregion
+
+    #region CombatChecks
+
+    void CheckForAttack()
+    {
+        if (Input.GetKeyDown(keybindManager.Attack))
+        {
+            attackInputBufferTimer = attackInputBuffer;
+        }
+
+        if (attackInputBufferTimer > 0)
+        {
+            meleeWeapon.slashTimer = meleeWeapon.slashDuration;
+            currentCombatState = CombatStates.Attack;
+        }
+    }
+
+    #endregion
+
+    #region CombatStates
+
+    #region Slash
+
+    void WhileSlashing()
+    {
+        meleeWeapon.slashGraphic.SetActive(true);
+        meleeWeapon.slashTimer -= Time.deltaTime;
+
+        for (int i = meleeWeapon.hitObjects.Count - 1; i >= 0; i--)
+        {
+            GameObject obj = meleeWeapon.hitObjects[i];
+            obj.GetComponent<EnemyManager>().Knockback(meleeWeapon.slashKnockback, direction);
+            currentMovementState = MovementStates.AttackPushback;
+            attackPushbackDirection = -direction;
+            meleeWeapon.ignoredObjects.Add(obj);
+            meleeWeapon.hitObjects.RemoveAt(i);
+        }
+
+        if (meleeWeapon.slashTimer < 0 || attackCancel)
+        {
+            attackCancel = false;
+            meleeWeapon.slashGraphic.SetActive(false);
+            meleeWeapon.slashCooldownTimer = meleeWeapon.slashCooldown;
+            meleeWeapon.ignoredObjects.Clear();
+            meleeWeapon.hitObjects.Clear();
+            currentCombatState = CombatStates.Neutral;
+        }
+    }
+
+    #endregion
+
     #endregion
 
     #endregion
@@ -1102,7 +1292,17 @@ public class PlayerController : MonoBehaviour
 
 public enum MovementStates
 {
-    Idle, Walk, Jump, Fall, Dash, ExitDash, WallSlide, WallJump
+    Idle, Walk, Jump, Fall, Dash, ExitDash, WallSlide, WallJump, Knockbacked, AttackPushback
+}
+
+public enum CombatStates
+{
+    Neutral, Attack
+}
+
+public enum AttackTypes
+{
+    Melee
 }
 
 public enum PlayerAnimations
