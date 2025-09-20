@@ -20,9 +20,9 @@ TagManager:
   - player
   - hurtzone
   - player attack
-  - 
-  - 
-  - 
+  - items
+  - environmentProps
+  - item detector
   - 
   - 
   - 
@@ -42,6 +42,12 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: Background
+    uniqueID: 1458961507
+    locked: 0
+  - name: Enemies
+    uniqueID: 1955261957
+    locked: 0
   - name: Attack
     uniqueID: 659195089
     locked: 0
@@ -50,6 +56,9 @@ TagManager:
     locked: 0
   - name: Player
     uniqueID: 1765854079
+    locked: 0
+  - name: Items
+    uniqueID: 3937645271
     locked: 0
   - name: Foreground
     uniqueID: 759076123

@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.UI;
+using TMPro;
 
 public class PlayerManager : MonoBehaviour
 {
@@ -17,6 +18,10 @@ public class PlayerManager : MonoBehaviour
     private float invincibilityTimer = 0;
     public Color regularColor;
     public Color invincibilityColor;
+
+    [Header("Item collection")]
+    public int dabloonCount;
+    public TextMeshProUGUI text;
 
     private void Awake()
     {
@@ -48,6 +53,8 @@ public class PlayerManager : MonoBehaviour
         {
             CheckForDeath();
         }
+
+        text.text = dabloonCount.ToString();
     }
 
     private void OnTriggerStay2D(Collider2D collision)

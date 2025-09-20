@@ -11,6 +11,7 @@ public class PlayerSlashManager : MonoBehaviour
     public float slashKnockback;
     public float slashDuration;
     public float slashTimer;
+    public float damage;
     public List<GameObject> hitObjects;
     public List<GameObject> ignoredObjects;
 

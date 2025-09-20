@@ -4,34 +4,26 @@ using System.Collections.Generic;
 public class ItemGenerator : MonoBehaviour
 {
     public GameObject itemPool;
-    public float spawnTime;
-    [SerializeField] private float spawnTimer;
-    public string itemType;
-    public string itemName;
-    [SerializeField] private List<GameObject> stack = new List<GameObject>();
+    public ItemTypes itemType;
+    public ItemNames itemName;
+    [SerializeField] private List<GameObject> stack;
     private GameObject chosenItem;
     private ObjectPooling objectPool;
 
-    void Start()
+    public void GenerateItem(List<GameObject> targetStack, ItemTypes targetItemType, ItemNames targetItemName)
     {
-        spawnTimer = spawnTime;
-    }
-
-    void Update()
-    {
-        if ((spawnTimer -= Time.deltaTime) <= 0)
-        {
-            spawnTimer = spawnTime;
-            GetItemFromPool();
-        }
+        itemType = targetItemType;
+        itemName = targetItemName;
+        stack = targetStack;
+        GetItemFromPool();
     }
 
     void GetItemFromPool()
     {
-        Transform typeTransform = FindChildByName(itemPool.transform, itemType);
+        Transform typeTransform = FindChildByName(itemPool.transform, itemType.ToString());
         if (typeTransform == null) return;
 
-        Transform subtypeTransform = FindChildByName(typeTransform, itemName);
+        Transform subtypeTransform = FindChildByName(typeTransform, itemName.ToString());
         if (subtypeTransform == null) return;
 
         objectPool = subtypeTransform.GetComponent<ObjectPooling>();
@@ -41,23 +33,18 @@ public class ItemGenerator : MonoBehaviour
         if (objectPool.stored.Count == 0) return;
 
         chosenItem = objectPool.stored[0];
+        TransferItemToStack();
+    }
+
+    void TransferItemToStack()
+    {
         stack.Add(chosenItem);
-        TransferItemToStorage();
+        DeleteItemFromPool();
     }
 
-    void TransferItemToStorage()
+    void DeleteItemFromPool()
     {
-        Invoke(nameof(CheckForTransferSuccess), 0.05f);
-    }
-
-    void CheckForTransferSuccess()
-    {
-        if (!stack.Contains(chosenItem))
-        {
-            objectPool?.stored.Remove(chosenItem);
-        }
-
-        stack.Remove(chosenItem);
+        objectPool?.stored?.Remove(chosenItem);
         chosenItem = null;
         objectPool = null;
     }
@@ -72,4 +59,14 @@ public class ItemGenerator : MonoBehaviour
 
         return null;
     }
+}
+
+public enum ItemTypes
+{
+    Currency
+}
+
+public enum ItemNames
+{
+    Dabloons
 }

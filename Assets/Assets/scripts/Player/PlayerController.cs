@@ -1263,7 +1263,9 @@ public class PlayerController : MonoBehaviour
         for (int i = meleeWeapon.hitObjects.Count - 1; i >= 0; i--)
         {
             GameObject obj = meleeWeapon.hitObjects[i];
-            obj.GetComponent<EnemyManager>().Knockback(meleeWeapon.slashKnockback, direction);
+            EnemyManager objManager = obj.GetComponent<EnemyManager>();
+            objManager.Knockback(meleeWeapon.slashKnockback, direction);
+            objManager.health -= meleeWeapon.damage;
             currentMovementState = MovementStates.AttackPushback;
             attackPushbackDirection = -direction;
             meleeWeapon.ignoredObjects.Add(obj);
