@@ -61,27 +61,30 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.0.27f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Assets\scripts\Enemy AI\Pathfinding\NodeCreator.cs" />
     <Compile Include="Assets\Assets\scripts\Player\ItemCollector.cs" />
     <Compile Include="Assets\Assets\scripts\Other\KeybindManager.cs" />
-    <Compile Include="Assets\Assets\scripts\AI\Pathfinding\PriorityQueue.cs" />
-    <Compile Include="Assets\Assets\scripts\AI\Damage Info\DamageInfo.cs" />
-    <Compile Include="Assets\Assets\scripts\AI\Enemy behaviours\EnemyManager.cs" />
+    <Compile Include="Assets\Assets\scripts\Enemy AI\SurvivorManager.cs" />
+    <Compile Include="Assets\Assets\scripts\Enemy AI\Pathfinding\PriorityQueue.cs" />
     <Compile Include="Assets\Assets\scripts\Player\PlayerSlashManager.cs" />
-    <Compile Include="Assets\Assets\scripts\AI\Pathfinding\NodeDefinitionClass.cs" />
-    <Compile Include="Assets\Assets\scripts\AI\SurvivorManager.cs" />
+    <Compile Include="Assets\Assets\scripts\Other\CustomSceneReferenceDrawer.cs" />
     <Compile Include="Assets\Assets\scripts\Other\ItemGenerator.cs" />
-    <Compile Include="Assets\Assets\scripts\AI\ResourceGathering.cs" />
-    <Compile Include="Assets\Assets\scripts\AI\Pathfinding\NodeWithPriority.cs" />
+    <Compile Include="Assets\Assets\scripts\Enemy AI\Pathfinding\NodeDefinitionClass.cs" />
+    <Compile Include="Assets\Assets\scripts\Enemy AI\Pathfinding\Pathfinder.cs" />
+    <Compile Include="Assets\Assets\scripts\Enemy AI\Pathfinding\NodeComparer.cs" />
     <Compile Include="Assets\Assets\scripts\Player\PlayerController.cs" />
     <Compile Include="Assets\Assets\scripts\Other\ResourceDrop.cs" />
-    <Compile Include="Assets\Assets\scripts\AI\Pathfinding\NodeComparer.cs" />
+    <Compile Include="Assets\Assets\scripts\Other\SceneNameAttribute.cs" />
+    <Compile Include="Assets\Assets\scripts\Enemy AI\Enemy behaviours\EnemyManager.cs" />
     <Compile Include="Assets\Assets\scripts\Other\ObjectPooling.cs" />
+    <Compile Include="Assets\Assets\scripts\Enemy AI\ResourceGathering.cs" />
     <Compile Include="Assets\Assets\scripts\Other\ResourceData.cs" />
-    <Compile Include="Assets\Assets\scripts\AI\Pathfinding\Pathfinder.cs" />
-    <Compile Include="Assets\Assets\scripts\AI\SurroundingsDatabase.cs" />
-    <Compile Include="Assets\Assets\scripts\AI\Enemy behaviours\Crawler behaviour.cs" />
+    <Compile Include="Assets\Assets\scripts\Enemy AI\Enemy behaviours\Crawler behaviour.cs" />
+    <Compile Include="Assets\Assets\scripts\Enemy AI\SurroundingsDatabase.cs" />
+    <Compile Include="Assets\Assets\scripts\Enemy AI\Damage Info\DamageInfo.cs" />
+    <Compile Include="Assets\Assets\scripts\Other\DoorManager.cs" />
+    <Compile Include="Assets\Assets\scripts\Enemy AI\Pathfinding\NodeWithPriority.cs" />
     <Compile Include="Assets\Assets\scripts\Player\PlayerManager.cs" />
-    <Compile Include="Assets\Assets\scripts\AI\Pathfinding\NodeCreator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Assets\TextMesh Pro\Shaders\TMPro.cginc" />

@@ -18,6 +18,11 @@ public class PlayerManager : MonoBehaviour
     private float invincibilityTimer = 0;
     public Color regularColor;
     public Color invincibilityColor;
+    public Transform checkpoint;
+    public Vector2 respawnPos;
+    public Color activeCheckpointColor;
+    public Color inactiveCheckpointColor; 
+    private static PlayerManager instance;
 
     [Header("Item collection")]
     public int dabloonCount;
@@ -25,6 +30,18 @@ public class PlayerManager : MonoBehaviour
 
     private void Awake()
     {
+        // Ensure only one player persists across scenes
+        if (instance == null)
+        {
+            instance = this;
+            DontDestroyOnLoad(gameObject); // keep this object when loading new scenes
+        }
+        else
+        {
+            Destroy(gameObject); // if another player spawned, destroy it
+        }
+
+        respawnPos = transform.position;
         pC = GetComponent<PlayerController>();
         sR = pC.graphic.GetComponent<SpriteRenderer>();
 
@@ -61,8 +78,6 @@ public class PlayerManager : MonoBehaviour
     {
         if (invincibilityTimer < 0)
         {
-            invincibilityTimer = invincibilityCooldown;
-
             if (collision.gameObject.CompareTag("hazard"))
             {
                 Death();
@@ -71,6 +86,12 @@ public class PlayerManager : MonoBehaviour
             {
                 health -= collision.gameObject.GetComponent<DamageInfo>().contactDamage;
             }
+            else
+            {
+                return;
+            }
+
+            invincibilityTimer = invincibilityCooldown;
 
             if (collision.transform.position.x < transform.position.x)
             {
@@ -103,7 +124,7 @@ public class PlayerManager : MonoBehaviour
 
     public void Respawn()
     {
-        transform.position = new Vector2(-12.69f, 6.56f);
+        transform.position = respawnPos;
         health = maxHealth;
         pC.currentMovementState = MovementStates.Idle;
         sR.color = regularColor;
@@ -133,5 +154,25 @@ public class PlayerManager : MonoBehaviour
                 list[i].gameObject.SetActive(false);
             }
         }
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.CompareTag("checkpoint"))
+        {
+            SetCheckpoint(collision.gameObject);
+        }
+    }
+
+    void SetCheckpoint(GameObject point)
+    {
+        if (checkpoint != null)
+        {
+            checkpoint.GetComponent<SpriteRenderer>().color = inactiveCheckpointColor;
+        }
+
+        checkpoint = point.transform;
+        respawnPos = checkpoint.transform.position;
+        checkpoint.GetComponent<SpriteRenderer>().color = activeCheckpointColor;
     }
 }

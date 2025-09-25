@@ -1113,7 +1113,6 @@ public class PlayerController : MonoBehaviour
 
     void LeapFromWall()
     {
-        Debug.Log("leap from wall");
         wallJumpLockTimer = wallJumpLockTime;
 
         StartCoroutine(JumpToLeapVelocityTransition(

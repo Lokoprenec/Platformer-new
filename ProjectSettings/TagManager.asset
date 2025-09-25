@@ -8,6 +8,7 @@ TagManager:
   - hazard
   - contact damage
   - death
+  - checkpoint
   layers:
   - Default
   - TransparentFX
@@ -23,8 +24,8 @@ TagManager:
   - items
   - environmentProps
   - item detector
-  - 
-  - 
+  - interactable objects
+  - player detectors
   - 
   - 
   - 
