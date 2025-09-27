@@ -9,6 +9,8 @@ TagManager:
   - contact damage
   - death
   - checkpoint
+  - door holder
+  - sceneManager
   layers:
   - Default
   - TransparentFX
