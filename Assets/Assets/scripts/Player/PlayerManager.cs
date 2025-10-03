@@ -4,12 +4,13 @@ using UnityEngine.UI;
 using TMPro;
 using Unity.Cinemachine;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class PlayerManager : MonoBehaviour
 {
     [Header("Health")]
     private SpriteRenderer sR;
-    private PlayerController pC;
+    public PlayerController pC;
     public GameObject healthBar;
     [SerializeField] private List<Transform> healthBarComponents;
     public Color activeHealth;
@@ -20,10 +21,12 @@ public class PlayerManager : MonoBehaviour
     private float invincibilityTimer = 0;
     public Color regularColor;
     public Color invincibilityColor;
-    public Transform checkpoint;
+    public string checkpointID = null;
     public Vector2 respawnPos;
     public Color activeCheckpointColor;
     public Color inactiveCheckpointColor;
+    [SceneName]
+    private string respawnScene;
 
     [Header("Item collection")]
     public int dabloonCount;
@@ -38,7 +41,6 @@ public class PlayerManager : MonoBehaviour
     private void Start()
     {
         col = GetComponent<BoxCollider2D>();
-        respawnPos = transform.position;
         pC = GetComponent<PlayerController>();
         sR = pC.graphic.GetComponent<SpriteRenderer>();
         cam = GameObject.Find("CinemachineCamera").GetComponent<CinemachinePositionComposer>();
@@ -49,6 +51,18 @@ public class PlayerManager : MonoBehaviour
         }
 
         health = maxHealth;
+
+        // Load last checkpoint if it exists
+        var state = WorldPersistenceManager.Instance?.checkpoints?
+            .Find(e => e.checkpointID == checkpointID);
+
+        if (state == null)
+        {
+            // fallback to default spawn only if no checkpoint
+            respawnPos = transform.position;
+            respawnScene = SceneManager.GetActiveScene().name;
+            Debug.Log("reset respawn");
+        }
     }
 
     private void Update()
@@ -117,7 +131,19 @@ public class PlayerManager : MonoBehaviour
 
     public void Death()
     {
+        LoadRespawnScene();
+    }
+
+    public void LoadRespawnScene()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+        SceneManager.LoadScene(respawnScene);
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
         Respawn();
+        SceneManager.sceneLoaded -= OnSceneLoaded; // unsubscribe so it doesn’t stack
     }
 
     public void Respawn()
@@ -126,6 +152,7 @@ public class PlayerManager : MonoBehaviour
         health = maxHealth;
         pC.currentMovementState = MovementStates.Idle;
         sR.color = regularColor;
+        gameObject.SetActive(true);
         PositionOnTheGround();
     }
 
@@ -157,22 +184,47 @@ public class PlayerManager : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.CompareTag("checkpoint"))
+        if (collision.CompareTag("checkpoint") && enabled)
         {
             SetCheckpoint(collision.gameObject);
+            Debug.Log("is touching a checkpoint");
         }
     }
 
     void SetCheckpoint(GameObject point)
     {
-        if (checkpoint != null)
+        if (checkpointID != null)
         {
-            checkpoint.GetComponent<SpriteRenderer>().color = inactiveCheckpointColor;
+            var state = WorldPersistenceManager.Instance.checkpoints
+            .Find(e => e.checkpointID == checkpointID);
+
+            if (state == null)
+            {
+                WorldPersistenceManager.Instance.checkpoints.Add(
+                    new CheckpointState { checkpointID = checkpointID, isActivated = false });
+            }
+            else
+            {
+                state.isActivated = false;
+            }
+
+            CheckpointController[] cCs = FindObjectsOfType<CheckpointController>();
+
+            foreach (CheckpointController cC in cCs)
+            {
+                if (cC.checkpointID == checkpointID)
+                {
+                    cC.Deactivate();
+                }
+            }
         }
 
-        checkpoint = point.transform;
+        CheckpointController checkpoint = point.GetComponent<CheckpointController>();
+        checkpointID = checkpoint.checkpointID;
         respawnPos = checkpoint.transform.position;
-        checkpoint.GetComponent<SpriteRenderer>().color = activeCheckpointColor;
+        checkpoint.Activate();
+        respawnScene = SceneManager.GetActiveScene().name;
+        Debug.Log("set checkpoint");
     }
 
     public void EnterNewScene(Transform enter, EntranceDirections direction)
@@ -206,6 +258,9 @@ public class PlayerManager : MonoBehaviour
         }
 
         transform.position = new Vector2(enter.position.x + offset.x, enter.position.y + offset.y);
+        enabled = true;
+        pC.enabled = true;
+        Debug.Log("enabled the manager");
         PositionOnTheGround();
     }
 

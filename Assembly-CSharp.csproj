@@ -64,6 +64,7 @@
     <Compile Include="Assets\Assets\scripts\Other\Scene transitioning\CustomSceneReferenceDrawer.cs" />
     <Compile Include="Assets\Assets\scripts\Enemy AI\Pathfinding\NodeCreator.cs" />
     <Compile Include="Assets\Assets\scripts\Player\ItemCollector.cs" />
+    <Compile Include="Assets\Assets\scripts\Other\Scene transitioning\WorldPersistenceManager.cs" />
     <Compile Include="Assets\Assets\scripts\Other\KeybindManager.cs" />
     <Compile Include="Assets\Assets\scripts\Enemy AI\SurvivorManager.cs" />
     <Compile Include="Assets\Assets\scripts\Enemy AI\Pathfinding\PriorityQueue.cs" />
@@ -84,7 +85,9 @@
     <Compile Include="Assets\Assets\scripts\Enemy AI\SurroundingsDatabase.cs" />
     <Compile Include="Assets\Assets\scripts\Enemy AI\Damage Info\DamageInfo.cs" />
     <Compile Include="Assets\Assets\scripts\Enemy AI\Pathfinding\NodeWithPriority.cs" />
+    <Compile Include="Assets\Assets\scripts\Other\Scene transitioning\UniqueID.cs" />
     <Compile Include="Assets\Assets\scripts\Player\PlayerManager.cs" />
+    <Compile Include="Assets\Assets\scripts\Other\Scene transitioning\CheckpointController.cs" />
     <Compile Include="Assets\Assets\scripts\Other\Scene transitioning\PersistenObjectsManager.cs" />
   </ItemGroup>
   <ItemGroup>

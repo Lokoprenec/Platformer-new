@@ -12,6 +12,8 @@ GameObject:
   - component: {fileID: 2024953206569009883}
   - component: {fileID: 4368149945610636686}
   - component: {fileID: 2716971454279160339}
+  - component: {fileID: 5740106145117669807}
+  - component: {fileID: 5750054421204008541}
   m_Layer: 14
   m_Name: Checkpoint
   m_TagString: checkpoint
@@ -27,7 +29,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6116036929410650844}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -24.504448, y: -7.353897, z: -0.08135942}
   m_LocalScale: {x: 2.7374518, y: 5.0833607, z: 1}
   m_ConstrainProportionsScale: 0
@@ -162,3 +164,31 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!114 &5740106145117669807
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6116036929410650844}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28d2ea385ce746648b3d6a6ab63942d8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  uniqueId: 
+--- !u!114 &5750054421204008541
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6116036929410650844}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c36935ec070ff644890fc4327d7bfb66, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  checkpointID: 
+  deactivationColor: {r: 0, g: 0.5568628, b: 0.43137258, a: 1}
+  activationColor: {r: 0, g: 1, b: 0.23359418, a: 1}

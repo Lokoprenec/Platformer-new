@@ -11,6 +11,12 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Major game mechanics testing scene.unity
     guid: 95ed3a35ffc01a447a542b52beea854e
+  - enabled: 1
+    path: Assets/Scenes/Demo game scenes/Demo starting scene.unity
+    guid: 37f0d50eae8bd9547bea454c3bd83049
+  - enabled: 1
+    path: Assets/Scenes/Demo game scenes/Demo scene 2.unity
+    guid: 797bf059b32a7a84583c20ccedd05cdd
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0

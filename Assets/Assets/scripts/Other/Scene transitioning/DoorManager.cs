@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections;
-using Unity.Cinemachine;
 
 public class DoorManager : MonoBehaviour
 {
@@ -26,6 +25,10 @@ public class DoorManager : MonoBehaviour
 
     public void PlayExitTransition()
     {
+        pM = FindAnyObjectByType<PlayerManager>();
+        pM.enabled = false;
+        pM.pC.enabled = false;
+        Debug.Log("disabled the manager");
         StartCoroutine(ExitTransitionCoroutine());
     }
 
