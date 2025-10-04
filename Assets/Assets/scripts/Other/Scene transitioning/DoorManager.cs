@@ -28,7 +28,6 @@ public class DoorManager : MonoBehaviour
         pM = FindAnyObjectByType<PlayerManager>();
         pM.enabled = false;
         pM.pC.enabled = false;
-        Debug.Log("disabled the manager");
         StartCoroutine(ExitTransitionCoroutine());
     }
 

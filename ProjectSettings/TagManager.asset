@@ -11,6 +11,7 @@ TagManager:
   - checkpoint
   - door holder
   - sceneManager
+  - item pool
   layers:
   - Default
   - TransparentFX

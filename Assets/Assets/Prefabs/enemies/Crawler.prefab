@@ -17,7 +17,7 @@ GameObject:
   - component: {fileID: 8731396400599404420}
   m_Layer: 7
   m_Name: Crawler
-  m_TagString: Untagged
+  m_TagString: contact damage
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -226,14 +226,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2410131c3f8de70419d8bdafb38322b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  itemGenerator: {fileID: 0}
   itemDrops:
   - itemType: 0
     itemName: 0
     amount: 5
   acquiredItems: []
-  minDropForce: 5
-  maxDropForce: 15
+  minDropForce: 6
+  maxDropForce: 12
 --- !u!1 &6728741435515930964
 GameObject:
   m_ObjectHideFlags: 0

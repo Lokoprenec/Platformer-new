@@ -1339,7 +1339,7 @@ GameObject:
   - component: {fileID: 4470055092804341950}
   m_Layer: 0
   m_Name: ItemPool
-  m_TagString: Untagged
+  m_TagString: item pool
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3323,6 +3323,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8231f26ae64b2b4458c5342104e4c825, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  pC: {fileID: 0}
   healthBar: {fileID: 8878348779627463691}
   healthBarComponents: []
   activeHealth: {r: 0.39488173, g: 1, b: 0, a: 1}
@@ -3332,7 +3333,7 @@ MonoBehaviour:
   invincibilityCooldown: 1
   regularColor: {r: 1, g: 1, b: 1, a: 1}
   invincibilityColor: {r: 0.4433962, g: 0.4433962, b: 0.4433962, a: 1}
-  checkpoint: {fileID: 0}
+  checkpointID: 
   respawnPos: {x: 0, y: 0}
   activeCheckpointColor: {r: 0.608083, g: 1, b: 0.4009434, a: 1}
   inactiveCheckpointColor: {r: 0, g: 0.5566038, b: 0.4321865, a: 1}

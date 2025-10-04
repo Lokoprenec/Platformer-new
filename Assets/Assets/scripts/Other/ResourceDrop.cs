@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 public class ResourceDrop : MonoBehaviour
 {
-    public ItemGenerator itemGenerator;
+    private ItemGenerator itemGenerator;
     public List<ResourceData> itemDrops;
     public List<GameObject> acquiredItems;
     public float minDropForce;
@@ -11,6 +11,8 @@ public class ResourceDrop : MonoBehaviour
 
     public void DropAllResources()
     {
+        itemGenerator = FindObjectOfType<ItemGenerator>();
+
         foreach (ResourceData data in itemDrops)
         {
             for (int i = 0; i < data.amount; i++)

@@ -27,6 +27,9 @@ public class PlayerManager : MonoBehaviour
     public Color inactiveCheckpointColor;
     [SceneName]
     private string respawnScene;
+    public float hazardCheckpointCooldown;
+    private float hazardCheckpointTimer;
+    private Vector2 hazardCheckpoint;
 
     [Header("Item collection")]
     public int dabloonCount;
@@ -61,8 +64,9 @@ public class PlayerManager : MonoBehaviour
             // fallback to default spawn only if no checkpoint
             respawnPos = transform.position;
             respawnScene = SceneManager.GetActiveScene().name;
-            Debug.Log("reset respawn");
         }
+
+        SetHazardCheckpointWhenGrounded();
     }
 
     private void Update()
@@ -78,25 +82,59 @@ public class PlayerManager : MonoBehaviour
 
         UpdateBar(healthBarComponents, activeHealth, inactiveHealth, health, maxHealth);
 
-        if (pC.knockbackedStunTimer < 0)
+        if (pC.knockbackedStunTimer <= 0)
         {
             CheckForDeath();
         }
 
         text.text = dabloonCount.ToString();
+
+        if (hazardCheckpointTimer >= 0)
+        {
+            hazardCheckpointTimer -= Time.deltaTime;
+        }
+        else
+        {
+            SetHazardCheckpointWhenGrounded();
+        }
+    }
+
+    void SetHazardCheckpointWhenGrounded()
+    {
+        if (pC.isGrounded)
+        {
+            hazardCheckpoint = transform.position;
+            hazardCheckpointTimer = hazardCheckpointCooldown;
+        }
     }
 
     private void OnTriggerStay2D(Collider2D collision)
     {
-        if (invincibilityTimer < 0)
+        if (collision.gameObject.CompareTag("hazard"))
         {
-            if (collision.gameObject.CompareTag("hazard"))
-            {
-                Death();
-            }
-            else if (collision.gameObject.CompareTag("contact damage"))
+            invincibilityTimer = invincibilityCooldown;
+            sR.color = invincibilityColor;
+            takeDamageFromHazard();
+        }
+        else if (invincibilityTimer < 0)
+        {
+
+            if (collision.gameObject.CompareTag("contact damage"))
             {
                 health -= collision.gameObject.GetComponent<DamageInfo>().contactDamage;
+
+                if (collision.transform.position.x < transform.position.x)
+                {
+                    pC.knockbackedXDir = 1;
+                }
+                else
+                {
+                    pC.knockbackedXDir = -1;
+                }
+
+                pC.knockbackedStunTimer = pC.knockbackedStun;
+                pC.knockbackedTimer = pC.knockbackedCooldown;
+                pC.currentMovementState = MovementStates.Knockbacked;
             }
             else
             {
@@ -104,21 +142,15 @@ public class PlayerManager : MonoBehaviour
             }
 
             invincibilityTimer = invincibilityCooldown;
-
-            if (collision.transform.position.x < transform.position.x)
-            {
-                pC.knockbackedXDir = 1;
-            }
-            else
-            {
-                pC.knockbackedXDir = -1;
-            }
-
-            pC.knockbackedStunTimer = pC.knockbackedStun;
-            pC.knockbackedTimer = pC.knockbackedCooldown;
-            pC.currentMovementState = MovementStates.Knockbacked;
             sR.color = invincibilityColor;
         }
+    }
+
+    void takeDamageFromHazard()
+    {
+        health -= 1;
+        transform.position = hazardCheckpoint;
+        pC.knockbackedStunTimer = 0;
     }
 
     public void CheckForDeath()
@@ -187,7 +219,6 @@ public class PlayerManager : MonoBehaviour
         if (collision.CompareTag("checkpoint") && enabled)
         {
             SetCheckpoint(collision.gameObject);
-            Debug.Log("is touching a checkpoint");
         }
     }
 
@@ -224,7 +255,7 @@ public class PlayerManager : MonoBehaviour
         respawnPos = checkpoint.transform.position;
         checkpoint.Activate();
         respawnScene = SceneManager.GetActiveScene().name;
-        Debug.Log("set checkpoint");
+        health = maxHealth;
     }
 
     public void EnterNewScene(Transform enter, EntranceDirections direction)
@@ -260,7 +291,6 @@ public class PlayerManager : MonoBehaviour
         transform.position = new Vector2(enter.position.x + offset.x, enter.position.y + offset.y);
         enabled = true;
         pC.enabled = true;
-        Debug.Log("enabled the manager");
         PositionOnTheGround();
     }
 
