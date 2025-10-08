@@ -1813,9 +1813,13 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 776993149}
     m_Modifications:
+    - target: {fileID: 5740106145117669807, guid: 94fa0caecfba8f443a167b0c9abd310d, type: 3}
+      propertyPath: uniqueId
+      value: 3ad0674d-84b7-4f14-89dc-eb4507e5197b
+      objectReference: {fileID: 0}
     - target: {fileID: 6116036929410650844, guid: 94fa0caecfba8f443a167b0c9abd310d, type: 3}
       propertyPath: m_Name
-      value: Demo scene 2 checkpoint
+      value: Checkpoint
       objectReference: {fileID: 0}
     - target: {fileID: 9058610961590723437, guid: 94fa0caecfba8f443a167b0c9abd310d, type: 3}
       propertyPath: m_LocalPosition.x

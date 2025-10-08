@@ -101,7 +101,7 @@ public class PlayerManager : MonoBehaviour
 
     void SetHazardCheckpointWhenGrounded()
     {
-        if (pC.isGrounded)
+        if (pC.isAbsolutelySafelyGrounded)
         {
             hazardCheckpoint = transform.position;
             hazardCheckpointTimer = hazardCheckpointCooldown;

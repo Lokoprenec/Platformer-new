@@ -88,6 +88,7 @@ public class PlayerController : MonoBehaviour
     public float hangTimeVelocityThreshold;
     public float hangTimeGravity;
     public bool isGrounded;
+    public bool isAbsolutelySafelyGrounded;
     public float groundCheckDistance;
     public LayerMask groundLayer;
 
@@ -196,6 +197,33 @@ public class PlayerController : MonoBehaviour
     {
         RaycastHit2D groundCheck = Physics2D.Raycast(new Vector2(col.bounds.min.x + 0.3f, col.bounds.min.y - groundCheckDistance), Vector2.right, col.bounds.max.x - col.bounds.min.x - 0.55f, groundLayer); //checking in a horizontal line right bellow player's feet
         isGrounded = groundCheck.collider != null;
+
+        if (isGrounded)
+        {
+            // How far to the sides to check
+            float sideOffset = 1f;  // distance to the left/right of the player's center
+            float extraCheckDistance = 0.1f;  // how far below to check for ground
+
+            // Base position at foot level
+            float footY = col.bounds.min.y;
+            float checkDistance = groundCheckDistance + extraCheckDistance;
+
+            // Left and right start positions
+            Vector2 leftStart = new Vector2(col.bounds.center.x - sideOffset, footY);
+            Vector2 rightStart = new Vector2(col.bounds.center.x + sideOffset, footY);
+
+            // Cast rays straight down from both sides
+            RaycastHit2D leftHit = Physics2D.Raycast(leftStart, Vector2.down, checkDistance, groundLayer);
+            RaycastHit2D rightHit = Physics2D.Raycast(rightStart, Vector2.down, checkDistance, groundLayer);
+
+            // Require both sides to have ground
+            isAbsolutelySafelyGrounded = leftHit.collider != null && rightHit.collider != null;
+
+            #if UNITY_EDITOR
+            Debug.DrawRay(leftStart, Vector2.down * checkDistance, Color.red);
+            Debug.DrawRay(rightStart, Vector2.down * checkDistance, Color.red);
+            #endif
+        }
 
         #if UNITY_EDITOR
         Debug.DrawLine(new Vector2(col.bounds.min.x, col.bounds.min.y - groundCheckDistance), new Vector2(col.bounds.max.x, col.bounds.min.y - groundCheckDistance), Color.red);

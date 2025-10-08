@@ -767,7 +767,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 6116036929410650844, guid: 94fa0caecfba8f443a167b0c9abd310d, type: 3}
       propertyPath: m_Name
-      value: demo scene 3 checkpoint
+      value: Checkpoint
       objectReference: {fileID: 0}
     - target: {fileID: 9058610961590723437, guid: 94fa0caecfba8f443a167b0c9abd310d, type: 3}
       propertyPath: m_LocalPosition.x
