@@ -9,15 +9,24 @@ public class ResourceDrop : MonoBehaviour
     public float minDropForce;
     public float maxDropForce;
 
+    private void Start()
+    {
+        foreach (ResourceData data in itemDrops)
+        {
+            data.amountLeft = data.amount;
+        }
+    }
+
     public void DropAllResources()
     {
         itemGenerator = FindObjectOfType<ItemGenerator>();
 
         foreach (ResourceData data in itemDrops)
         {
-            for (int i = 0; i < data.amount; i++)
+            for (int i = data.amountLeft; i > 0; i--)
             {
                 itemGenerator.GenerateItem(acquiredItems, data.itemType, data.itemName);
+                data.amountLeft -= 1;
             }
         }
 
@@ -25,6 +34,27 @@ public class ResourceDrop : MonoBehaviour
         {
             DropResource(obj);
         }
+
+        acquiredItems.Clear();
+    }
+
+    public void DropSomeOfTheResource(int amount, int typeIndex)
+    {
+        itemGenerator = FindObjectOfType<ItemGenerator>();
+        ResourceData data = itemDrops[typeIndex];
+
+        for (int i = amount; i > 0; i--)
+        {
+            itemGenerator.GenerateItem(acquiredItems, data.itemType, data.itemName);
+            data.amountLeft -= 1;
+        }
+
+        foreach (GameObject obj in acquiredItems)
+        {
+            DropResource(obj);
+        }
+
+        acquiredItems.Clear();
     }
 
     void DropResource(GameObject item)

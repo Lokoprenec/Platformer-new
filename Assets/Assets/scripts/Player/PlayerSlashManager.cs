@@ -15,7 +15,7 @@ public class PlayerSlashManager : MonoBehaviour
     public List<GameObject> hitObjects;
     public List<GameObject> ignoredObjects;
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    private void OnTriggerStay2D(Collider2D collision)
     {
         if (hitObjects.Contains(collision.gameObject) || ignoredObjects.Contains(collision.gameObject)) return;
         hitObjects.Add(collision.gameObject);

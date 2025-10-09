@@ -222,7 +222,11 @@ public class PlayerController : MonoBehaviour
             #if UNITY_EDITOR
             Debug.DrawRay(leftStart, Vector2.down * checkDistance, Color.red);
             Debug.DrawRay(rightStart, Vector2.down * checkDistance, Color.red);
-            #endif
+#endif
+        }
+        else
+        {
+            isAbsolutelySafelyGrounded = false;
         }
 
         #if UNITY_EDITOR
@@ -1291,8 +1295,20 @@ public class PlayerController : MonoBehaviour
         {
             GameObject obj = meleeWeapon.hitObjects[i];
             EnemyManager objManager = obj.GetComponent<EnemyManager>();
-            objManager.Knockback(meleeWeapon.slashKnockback, direction);
-            objManager.health -= meleeWeapon.damage;
+            ResourceHolder objResourceHolder = obj.GetComponent<ResourceHolder>();
+
+            if (objManager != null)
+            {
+                objManager.Knockback(meleeWeapon.slashKnockback, direction);
+                objManager.health -= meleeWeapon.damage;
+            }
+
+            if (objResourceHolder != null)
+            {
+                objResourceHolder.health -= meleeWeapon.damage;
+                objResourceHolder.Hit(meleeWeapon.damage);
+            }
+
             currentMovementState = MovementStates.AttackPushback;
             attackPushbackDirection = -direction;
             meleeWeapon.ignoredObjects.Add(obj);
