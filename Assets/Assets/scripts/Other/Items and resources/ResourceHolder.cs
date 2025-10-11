@@ -21,7 +21,6 @@ public class ResourceHolder : MonoBehaviour
         if (health <= 0)
         {
             resourceDrop.DropAllResources();
-            Debug.Log("resourcesDropped");
             Deactivate();
         }
         else

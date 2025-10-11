@@ -43,6 +43,7 @@ public class PlayerController : MonoBehaviour
     public PlayerAnimations landingRunTransitionAnimation;
     public PlayerAnimations turnTransitionAnimation;
     public PlayerAnimations knockbackedAnimation;
+    public PlayerAnimations healingAnimation;
 
     [Header("Animation variables")]
     public float landingCooldownMultiplier;
@@ -289,6 +290,13 @@ public class PlayerController : MonoBehaviour
         }
 
         prevDirection = direction;
+
+        if (Input.GetKey(keybindManager.Heal) && isGrounded && currentMovementState != MovementStates.Healing && pM.soulBar.value >= pM.amountOfSoulRequiredToHeal)
+        {
+            pM.soulValueOnHeal = pM.soulBar.value;
+            pM.healTimer = pM.healTime;
+            currentMovementState = MovementStates.Healing;
+        }
     }
 
     private int GetAxis(KeyCode negative, KeyCode positive)
@@ -404,7 +412,11 @@ public class PlayerController : MonoBehaviour
 
         landingTimer -= Time.deltaTime;
 
-        if (transform.localScale.x != direction)
+        if (currentMovementState == MovementStates.Healing)
+        {
+            PlayAnimation(healingAnimation.ToString());
+        }
+        else if (transform.localScale.x != direction)
         {
             PlayAnimation(turnTransitionAnimation.ToString());
             absoluteTurnLockTimer = absoluteTurnLockCooldown;
@@ -643,6 +655,12 @@ public class PlayerController : MonoBehaviour
             case MovementStates.AttackPushback: // ATTACK PUSHBACK
 
                 WhilePushedBack();
+
+                break;
+
+            case MovementStates.Healing:
+
+                WhileHealing();
 
                 break;
         }
@@ -1198,6 +1216,7 @@ public class PlayerController : MonoBehaviour
         if (knockbackedStunTimer < 0)
         {
             SetStateToFall();
+            currentCombatState = CombatStates.Neutral;
         }
     }
 
@@ -1215,6 +1234,38 @@ public class PlayerController : MonoBehaviour
             attackPushbackTimer = attackPushbackCooldown;
             currentMovementState = MovementStates.Idle;
         }
+    }
+
+    #endregion
+
+    #region
+
+    void WhileHealing()
+    {
+        if (Input.GetKey(keybindManager.Heal) && isGrounded)
+        {
+            rb.linearVelocityX = 0;
+            currentCombatState = CombatStates.Locked;
+
+            if (pM.healTimer < 0)
+            {
+                pM.Heal();
+            }
+            else
+            {
+                pM.WhileHealing();
+            }
+        }
+        else
+        {
+            pM.CancelHealing();
+        }
+    }
+
+    public void StopHealing()
+    {
+        currentMovementState = MovementStates.Idle;
+        currentCombatState = CombatStates.Neutral;
     }
 
     #endregion
@@ -1259,6 +1310,12 @@ public class PlayerController : MonoBehaviour
                 }
 
                 break;
+
+            case CombatStates.Locked: // LOCKED
+
+                //locks the logic
+
+                break;
         }
     }
 
@@ -1301,6 +1358,7 @@ public class PlayerController : MonoBehaviour
             {
                 objManager.Knockback(meleeWeapon.slashKnockback, direction);
                 objManager.health -= meleeWeapon.damage;
+                pM.IncreaseSoul();
             }
 
             if (objResourceHolder != null)
@@ -1337,12 +1395,12 @@ public class PlayerController : MonoBehaviour
 
 public enum MovementStates
 {
-    Idle, Walk, Jump, Fall, Dash, ExitDash, WallSlide, WallJump, Knockbacked, AttackPushback
+    Idle, Walk, Jump, Fall, Dash, ExitDash, WallSlide, WallJump, Knockbacked, AttackPushback, Healing
 }
 
 public enum CombatStates
 {
-    Neutral, Attack
+    Neutral, Attack, Locked
 }
 
 public enum AttackTypes

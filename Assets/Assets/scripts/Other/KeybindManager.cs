@@ -11,4 +11,5 @@ public class KeybindManager : MonoBehaviour
     public KeyCode Jump;
     public KeyCode Bash;
     public KeyCode Attack;
+    public KeyCode Heal;
 }

@@ -8,11 +8,16 @@ using UnityEngine.SceneManagement;
 
 public class PlayerManager : MonoBehaviour
 {
+    #region General
+
     [Header("Health")]
     private SpriteRenderer sR;
     public PlayerController pC;
     public GameObject healthBar;
+    public Slider soulBar;
     [SerializeField] private List<Transform> healthBarComponents;
+    public float soulIncreaseOnHit;
+    public float amountOfSoulRequiredToHeal;
     public Color activeHealth;
     public Color inactiveHealth;
     public float health;
@@ -30,6 +35,14 @@ public class PlayerManager : MonoBehaviour
     public float hazardCheckpointCooldown;
     private float hazardCheckpointTimer;
     private Vector2 hazardCheckpoint;
+    public float healTime;
+    public float healTimer;
+    public int healAmount;
+    public float soulValueOnHeal;
+    public Animator healEffectGraphic;
+    public HealEffectAnimations noneAnimation;
+    public HealEffectAnimations healingAnimation;
+    public HealEffectAnimations healedAnimation;
 
     [Header("Item collection")]
     public int dabloonCount;
@@ -54,6 +67,8 @@ public class PlayerManager : MonoBehaviour
         }
 
         health = maxHealth;
+
+        soulBar.value = 0;
 
         // Load last checkpoint if it exists
         var state = WorldPersistenceManager.Instance?.checkpoints?
@@ -99,120 +114,9 @@ public class PlayerManager : MonoBehaviour
         }
     }
 
-    void SetHazardCheckpointWhenGrounded()
-    {
-        if (pC.isAbsolutelySafelyGrounded)
-        {
-            hazardCheckpoint = transform.position;
-            hazardCheckpointTimer = hazardCheckpointCooldown;
-        }
-    }
+    #endregion
 
-    private void OnTriggerStay2D(Collider2D collision)
-    {
-        if (collision.gameObject.CompareTag("hazard"))
-        {
-            invincibilityTimer = invincibilityCooldown;
-            sR.color = invincibilityColor;
-            takeDamageFromHazard();
-        }
-        else if (invincibilityTimer < 0)
-        {
-
-            if (collision.gameObject.CompareTag("contact damage"))
-            {
-                health -= collision.gameObject.GetComponent<DamageInfo>().contactDamage;
-
-                if (collision.transform.position.x < transform.position.x)
-                {
-                    pC.knockbackedXDir = 1;
-                }
-                else
-                {
-                    pC.knockbackedXDir = -1;
-                }
-
-                pC.knockbackedStunTimer = pC.knockbackedStun;
-                pC.knockbackedTimer = pC.knockbackedCooldown;
-                pC.currentMovementState = MovementStates.Knockbacked;
-            }
-            else
-            {
-                return;
-            }
-
-            invincibilityTimer = invincibilityCooldown;
-            sR.color = invincibilityColor;
-        }
-    }
-
-    void takeDamageFromHazard()
-    {
-        health -= 1;
-        transform.position = hazardCheckpoint;
-        pC.knockbackedStunTimer = 0;
-    }
-
-    public void CheckForDeath()
-    {
-        if (health <= 0)
-        {
-            Death();
-        }
-    }
-
-    public void Death()
-    {
-        LoadRespawnScene();
-    }
-
-    public void LoadRespawnScene()
-    {
-        SceneManager.sceneLoaded += OnSceneLoaded;
-        SceneManager.LoadScene(respawnScene);
-    }
-
-    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-    {
-        Respawn();
-        SceneManager.sceneLoaded -= OnSceneLoaded; // unsubscribe so it doesn’t stack
-    }
-
-    public void Respawn()
-    {
-        transform.position = respawnPos;
-        health = maxHealth;
-        pC.currentMovementState = MovementStates.Idle;
-        sR.color = regularColor;
-        gameObject.SetActive(true);
-        PositionOnTheGround();
-    }
-
-    public void UpdateBar(List<Transform> list, Color active, Color inactive, float value, float maxValue)
-    {
-        for (int i = 0; i < list.Count; i++)
-        {
-            Image image = list[i].GetComponent<Image>();
-            
-            if (i < maxValue)
-            {
-                list[i].gameObject.SetActive(true);
-
-                if (i >= value)
-                {
-                    image.color = inactive;
-                }
-                else
-                {
-                    image.color = active;
-                }
-            }
-            else
-            {
-                list[i].gameObject.SetActive(false);
-            }
-        }
-    }
+    #region Checkpoints
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -256,6 +160,41 @@ public class PlayerManager : MonoBehaviour
         checkpoint.Activate();
         respawnScene = SceneManager.GetActiveScene().name;
         health = maxHealth;
+    }
+
+    #endregion
+
+    #region Scene transitioning
+
+    void SetHazardCheckpointWhenGrounded()
+    {
+        if (pC.isAbsolutelySafelyGrounded)
+        {
+            hazardCheckpoint = transform.position;
+            hazardCheckpointTimer = hazardCheckpointCooldown;
+        }
+    }
+
+    public void LoadRespawnScene()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+        SceneManager.LoadScene(respawnScene);
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        Respawn();
+        SceneManager.sceneLoaded -= OnSceneLoaded; // unsubscribe so it doesn’t stack
+    }
+
+    public void Respawn()
+    {
+        transform.position = respawnPos;
+        health = maxHealth;
+        pC.currentMovementState = MovementStates.Idle;
+        sR.color = regularColor;
+        gameObject.SetActive(true);
+        PositionOnTheGround();
     }
 
     public void EnterNewScene(Transform enter, EntranceDirections direction)
@@ -326,5 +265,139 @@ public class PlayerManager : MonoBehaviour
         }
 
         pC.currentMovementState = MovementStates.Idle;
+    }
+
+    #endregion
+
+    #region Taking damage
+
+    private void OnTriggerStay2D(Collider2D collision)
+    {
+        if (collision.gameObject.CompareTag("hazard"))
+        {
+            invincibilityTimer = invincibilityCooldown;
+            sR.color = invincibilityColor;
+            takeDamageFromHazard();
+        }
+        else if (invincibilityTimer < 0)
+        {
+
+            if (collision.gameObject.CompareTag("contact damage"))
+            {
+                health -= collision.gameObject.GetComponent<DamageInfo>().contactDamage;
+
+                if (collision.transform.position.x < transform.position.x)
+                {
+                    pC.knockbackedXDir = 1;
+                }
+                else
+                {
+                    pC.knockbackedXDir = -1;
+                }
+
+                pC.knockbackedStunTimer = pC.knockbackedStun;
+                pC.knockbackedTimer = pC.knockbackedCooldown;
+                pC.currentMovementState = MovementStates.Knockbacked;
+                pC.currentCombatState = CombatStates.Locked;
+            }
+            else
+            {
+                return;
+            }
+
+            invincibilityTimer = invincibilityCooldown;
+            sR.color = invincibilityColor;
+        }
+    }
+
+    void takeDamageFromHazard()
+    {
+        health -= 1;
+        transform.position = hazardCheckpoint;
+        pC.knockbackedStunTimer = 0;
+    }
+
+    public void CheckForDeath()
+    {
+        if (health <= 0)
+        {
+            Death();
+        }
+    }
+
+    public void Death()
+    {
+        LoadRespawnScene();
+    }
+
+    #endregion
+
+    #region Healing
+
+    public void IncreaseSoul()
+    {
+        soulBar.value = Mathf.Clamp(soulBar.value + soulIncreaseOnHit, 0, 1);
+    }
+
+    public void WhileHealing()
+    {
+        healTimer -= Time.deltaTime;
+        float t = healTimer / healTime;
+        soulBar.value = Mathf.Clamp(soulValueOnHeal - amountOfSoulRequiredToHeal + (amountOfSoulRequiredToHeal * t), 0, 1);
+
+        if (!healEffectGraphic.GetCurrentAnimatorStateInfo(0).IsName(healedAnimation.ToString()))
+        {
+            healEffectGraphic.Play(healingAnimation.ToString());
+        }
+    }
+
+    public void Heal()
+    {
+        health = Mathf.Clamp(health + healAmount, 0, maxHealth);
+        pC.StopHealing();
+        healEffectGraphic.Play(healedAnimation.ToString());
+    }
+
+    public void CancelHealing()
+    {
+        pC.StopHealing();
+        healEffectGraphic.Play(noneAnimation.ToString());
+    }
+
+    #endregion
+
+    #region UI
+
+    public void UpdateBar(List<Transform> list, Color active, Color inactive, float value, float maxValue)
+    {
+        for (int i = 0; i < list.Count; i++)
+        {
+            Image image = list[i].GetComponent<Image>();
+
+            if (i < maxValue)
+            {
+                list[i].gameObject.SetActive(true);
+
+                if (i >= value)
+                {
+                    image.color = inactive;
+                }
+                else
+                {
+                    image.color = active;
+                }
+            }
+            else
+            {
+                list[i].gameObject.SetActive(false);
+            }
+        }
+    }
+
+    #endregion
+
+    public enum HealEffectAnimations
+    {
+        None, Healing, Healed
     }
 }
