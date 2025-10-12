@@ -214,6 +214,8 @@ MonoBehaviour:
   deathLayer:
     serializedVersion: 2
     m_Bits: 4096
+  hitColor: {r: 1, g: 0.7311321, b: 0.7453158, a: 1}
+  normalColor: {r: 1, g: 0, b: 0.5448122, a: 1}
 --- !u!114 &8731396400599404420
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -230,6 +232,7 @@ MonoBehaviour:
   - itemType: 0
     itemName: 0
     amount: 5
+    amountLeft: 0
   acquiredItems: []
   minDropForce: 6
   maxDropForce: 12

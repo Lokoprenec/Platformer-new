@@ -17,12 +17,15 @@ public class EnemyManager : MonoBehaviour
     public float health;
     public Color deathColor;
     public LayerMask deathLayer;
+    public Color hitColor;
+    public Color normalColor;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         health = maxHealth;
         rb = GetComponent<Rigidbody2D>();
+        graphic.color = normalColor;
     }
 
     // Update is called once per frame
@@ -57,12 +60,14 @@ public class EnemyManager : MonoBehaviour
         rb.linearVelocity = force * direction;
         knockbackTimer = knockbackTime;
         knockbackStunTimer = knockbackStunTime;
+        graphic.color = hitColor;
     }
 
     void EndKnockback()
     {
         knockbacked = false;
         movementLogic.enabled = true;
+        graphic.color = normalColor;
     }
 
     void Death()

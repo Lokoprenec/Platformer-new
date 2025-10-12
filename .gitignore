@@ -6,3 +6,6 @@ Logs
 builds
 UserSettings
 obj
+Assets/Resources
+Assets/Resources
+*.7z
