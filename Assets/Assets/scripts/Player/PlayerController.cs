@@ -153,6 +153,10 @@ public class PlayerController : MonoBehaviour
     public float attackPushbackCooldown;
     private float attackPushbackTimer;
     private float attackPushbackDirection;
+    private PlayerAttackDirections attackPushbackType;
+    public float pogoForce;
+    public float pogoGravity;
+    public float pogoCutGravity;
 
     [Header("Combat")]
 
@@ -658,9 +662,17 @@ public class PlayerController : MonoBehaviour
 
                 break;
 
-            case MovementStates.Healing:
+            case MovementStates.Healing: // HEALING
 
                 WhileHealing();
+
+                break;
+
+            case MovementStates.Pogo: // POGO
+
+                WhilePogoing();
+                CheckForHorizontalMovement();
+                CheckForAbilities();
 
                 break;
         }
@@ -1226,6 +1238,31 @@ public class PlayerController : MonoBehaviour
 
     void WhilePushedBack()
     {
+        switch (attackPushbackType)
+        {
+            case PlayerAttackDirections.Side:
+
+                SideAttackPushback();
+
+                break;
+
+            case PlayerAttackDirections.Up:
+
+                currentMovementState = MovementStates.Idle;
+
+                break;
+
+            case PlayerAttackDirections.Down:
+
+                currentMovementState = MovementStates.Pogo;
+                Pogo();
+
+                break;
+        }
+    }
+
+    void SideAttackPushback()
+    {
         attackPushbackTimer -= Time.deltaTime;
         rb.linearVelocityX = attackPushbackForce * attackPushbackDirection;
 
@@ -1238,7 +1275,7 @@ public class PlayerController : MonoBehaviour
 
     #endregion
 
-    #region
+    #region Healing
 
     void WhileHealing()
     {
@@ -1266,6 +1303,37 @@ public class PlayerController : MonoBehaviour
     {
         currentMovementState = MovementStates.Idle;
         currentCombatState = CombatStates.Neutral;
+    }
+
+    #endregion
+
+    #region Pogo
+
+    void Pogo()
+    {
+        wallJumpBufferCounter = 0;
+        wallJumpCoyoteTimeCounter = 0;
+        rb.gravityScale = pogoGravity;
+        rb.linearVelocityY = pogoForce;
+        jumpBufferCounter = 0;
+    }
+
+    void WhilePogoing()
+    {
+        if (Mathf.Abs(rb.linearVelocityY) <= hangTimeVelocityThreshold)
+        {
+            rb.gravityScale = hangTimeGravity; //bonus air time
+            SetStateToFall();
+        }
+
+        if (rb.linearVelocityY < -0.01) //fall
+        {
+            SetStateToFall();
+        }
+        else if (!Input.GetKey(keybindManager.Attack))
+        {
+            rb.gravityScale = pogoCutGravity; //cuts the pogo when the button is released
+        }
     }
 
     #endregion
@@ -1332,8 +1400,26 @@ public class PlayerController : MonoBehaviour
 
         if (attackInputBufferTimer > 0)
         {
+            CheckForMeleeAttackDirection();
             meleeWeapon.slashTimer = meleeWeapon.slashDuration;
             currentCombatState = CombatStates.Attack;
+            Invoke("CheckForMeleeAttackDirection", 0.03f);
+        }
+    }
+
+    void CheckForMeleeAttackDirection()
+    {
+        if (Input.GetKey(keybindManager.Up))
+        {
+            meleeWeapon.ChangeAttackDirection(PlayerAttackDirections.Up);
+        }
+        else if (Input.GetKey(keybindManager.Down))
+        {
+            meleeWeapon.ChangeAttackDirection(PlayerAttackDirections.Down);
+        }
+        else
+        {
+            meleeWeapon.ChangeAttackDirection(PlayerAttackDirections.Side);
         }
     }
 
@@ -1345,8 +1431,32 @@ public class PlayerController : MonoBehaviour
 
     void WhileSlashing()
     {
-        meleeWeapon.slashGraphic.SetActive(true);
+        meleeWeapon.selectedSlashGraphic.SetActive(true);
         meleeWeapon.slashTimer -= Time.deltaTime;
+        Vector2 attackDir = Vector2.zero;
+
+        switch (meleeWeapon.currentDirection)
+        {
+            case PlayerAttackDirections.Side:
+
+                attackDir.x = direction;
+
+                break;
+
+            case PlayerAttackDirections.Up:
+
+                attackDir.y = 0.225f;
+
+                break;
+
+            case PlayerAttackDirections.Down:
+
+                attackDir.y = -0.2f;
+
+                break;
+        }
+
+        attackPushbackType = meleeWeapon.currentDirection;
 
         for (int i = meleeWeapon.hitObjects.Count - 1; i >= 0; i--)
         {
@@ -1356,7 +1466,7 @@ public class PlayerController : MonoBehaviour
 
             if (objManager != null)
             {
-                objManager.Knockback(meleeWeapon.slashKnockback, direction);
+                objManager.Knockback(meleeWeapon.slashKnockback, attackDir);
                 objManager.health -= meleeWeapon.damage;
                 pM.IncreaseSoul();
             }
@@ -1376,7 +1486,12 @@ public class PlayerController : MonoBehaviour
         if (meleeWeapon.slashTimer < 0 || attackCancel)
         {
             attackCancel = false;
-            meleeWeapon.slashGraphic.SetActive(false);
+
+            foreach (GameObject graphic in meleeWeapon.slashGraphics)
+            {
+                graphic.SetActive(false);
+            }
+
             meleeWeapon.slashCooldownTimer = meleeWeapon.slashCooldown;
             meleeWeapon.ignoredObjects.Clear();
             meleeWeapon.hitObjects.Clear();
@@ -1395,7 +1510,7 @@ public class PlayerController : MonoBehaviour
 
 public enum MovementStates
 {
-    Idle, Walk, Jump, Fall, Dash, ExitDash, WallSlide, WallJump, Knockbacked, AttackPushback, Healing
+    Idle, Walk, Jump, Fall, Dash, ExitDash, WallSlide, WallJump, Knockbacked, AttackPushback, Healing, Pogo
 }
 
 public enum CombatStates

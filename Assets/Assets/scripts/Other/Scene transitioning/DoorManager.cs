@@ -46,7 +46,7 @@ public class DoorManager : MonoBehaviour
         yield return StartCoroutine(LoadNewScene(sceneToLoad));
     }
 
-    void PlayEnterTransition()
+    public void PlayEnterTransition()
     {
         sceneTransition.Play("enterScene");
     }

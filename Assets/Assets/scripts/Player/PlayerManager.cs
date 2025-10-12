@@ -43,6 +43,9 @@ public class PlayerManager : MonoBehaviour
     public HealEffectAnimations noneAnimation;
     public HealEffectAnimations healingAnimation;
     public HealEffectAnimations healedAnimation;
+    public Color inactiveSoulColor;
+    public Color activeSoulColor;
+    public Image soulBarMeterGraphic;
 
     [Header("Item collection")]
     public int dabloonCount;
@@ -53,6 +56,7 @@ public class PlayerManager : MonoBehaviour
     public LayerMask groundLayer;
     private BoxCollider2D col;
     private CinemachinePositionComposer cam;
+    public Animator sceneTransition;
 
     private void Start()
     {
@@ -111,6 +115,15 @@ public class PlayerManager : MonoBehaviour
         else
         {
             SetHazardCheckpointWhenGrounded();
+        }
+
+        if (soulBar.value >= amountOfSoulRequiredToHeal)
+        {
+            soulBarMeterGraphic.color = activeSoulColor;
+        }
+        else
+        {
+            soulBarMeterGraphic.color = inactiveSoulColor;
         }
     }
 
@@ -177,18 +190,78 @@ public class PlayerManager : MonoBehaviour
 
     public void LoadRespawnScene()
     {
-        SceneManager.sceneLoaded += OnSceneLoaded;
-        SceneManager.LoadScene(respawnScene);
+        // Play the exit animation
+        PlayExitTransition();
     }
 
-    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    public void PlayExitTransition()
     {
+        enabled = false;
+        pC.enabled = false;
+        StartCoroutine(ExitTransitionCoroutine());
+    }
+
+    private IEnumerator ExitTransitionCoroutine()
+    {
+        // Play the exit animation
+        sceneTransition.Play("exitScene");
+
+        // Wait until the animation is done
+        AnimatorStateInfo stateInfo = sceneTransition.GetCurrentAnimatorStateInfo(0);
+        float clipLength = stateInfo.length;
+
+        yield return new WaitForSeconds(clipLength);
+
+        // Load the new scene
+        yield return StartCoroutine(LoadNewScene(respawnScene));
+    }
+
+    public void PlayEnterTransition()
+    {
+        sceneTransition.Play("enterScene");
+    }
+
+    private IEnumerator LoadNewScene(string newScene)
+    {
+        // Remember old scene
+        Scene oldScene = SceneManager.GetActiveScene();
+
+        GameObject[] sceneManagers = GameObject.FindGameObjectsWithTag("sceneManager");
+
+        foreach (var manager in sceneManagers)
+        {
+            manager.SetActive(false);
+        }
+
+        // Load new scene additively
+        AsyncOperation loadOp = SceneManager.LoadSceneAsync(newScene, LoadSceneMode.Additive);
+        yield return loadOp;
+
+        // Set the new scene as active
+        Scene newLoadedScene = SceneManager.GetSceneByName(newScene);
+        SceneManager.SetActiveScene(newLoadedScene);
+
+        // Wait 1 frame to ensure everything is initialized
+        yield return null;
+
         Respawn();
-        SceneManager.sceneLoaded -= OnSceneLoaded; // unsubscribe so it doesn’t stack
+        PlayEnterTransition();
+
+        // Now unload the old scene safely
+        AsyncOperation unloadOp = SceneManager.UnloadSceneAsync(oldScene);
+        yield return unloadOp;
+
+        foreach (var manager in sceneManagers)
+        {
+            if (manager == null) continue;
+            manager.SetActive(true);
+        }
     }
 
     public void Respawn()
     {
+        enabled = true;
+        pC.enabled = true;
         transform.position = respawnPos;
         health = maxHealth;
         pC.currentMovementState = MovementStates.Idle;

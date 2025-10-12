@@ -50,11 +50,11 @@ public class EnemyManager : MonoBehaviour
         }
     }
 
-    public void Knockback(float force, float direction)
+    public void Knockback(float force, Vector2 direction)
     {
         knockbacked = true;
         movementLogic.enabled = false;
-        rb.linearVelocityX = force * direction;
+        rb.linearVelocity = force * direction;
         knockbackTimer = knockbackTime;
         knockbackStunTimer = knockbackStunTime;
     }
