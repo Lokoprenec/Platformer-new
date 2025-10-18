@@ -731,11 +731,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8793441947642004473, guid: dfe4b8d83a31582449d00d8a06252c85, type: 3}
   m_PrefabInstance: {fileID: 487389858}
   m_PrefabAsset: {fileID: 0}
---- !u!95 &549222503 stripped
-Animator:
-  m_CorrespondingSourceObject: {fileID: 478289637204387232, guid: a1554cf6752b59f4faa939ab495b4182, type: 3}
-  m_PrefabInstance: {fileID: 1442319969}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &564515544
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2277,10 +2272,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1468165549}
     m_Modifications:
-    - target: {fileID: 940722480392986172, guid: a1554cf6752b59f4faa939ab495b4182, type: 3}
-      propertyPath: sceneTransition
-      value: 
-      objectReference: {fileID: 549222503}
     - target: {fileID: 1302141998617670299, guid: a1554cf6752b59f4faa939ab495b4182, type: 3}
       propertyPath: m_LocalPosition.x
       value: -6.8

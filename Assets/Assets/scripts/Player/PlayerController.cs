@@ -37,6 +37,7 @@ public class PlayerController : MonoBehaviour
     public PlayerAnimations diagonalDownBashAnimation;
     public PlayerAnimations wallSlideStartAnimation;
     public PlayerAnimations wallSlideEndAnimation;
+    public PlayerAnimations wallLeapAnimation;
     public PlayerAnimations wallJumpAnimation;
     public PlayerAnimations wallPressAnimation;
     public PlayerAnimations runTransitionAnimation;
@@ -552,10 +553,18 @@ public class PlayerController : MonoBehaviour
 
                 if (!isJumping)
                 {
-                    PlayAnimation(wallJumpAnimation.ToString());
                     fallTime = 0;
                     isJumping = true;
                     isFalling = false;
+
+                    if (wallJumpForm == "wallLeap")
+                    {
+                        PlayAnimation(wallLeapAnimation.ToString());
+                    }
+                    else
+                    {
+                        PlayAnimation(wallJumpAnimation.ToString());
+                    }
                 }
 
                 break;
@@ -1154,11 +1163,6 @@ public class PlayerController : MonoBehaviour
         CheckForJumpForm();
         Invoke("CheckForJumpForm", 0.1f);
         Invoke("CheckForJumpForm", 0.1f);
-
-        if (wallJumpForm != "wallLeap")
-        {
-            wallJumpForm = "wallJump";
-        }
     }
 
     void CheckForJumpForm()
@@ -1183,6 +1187,11 @@ public class PlayerController : MonoBehaviour
 
                 break;
         }
+
+        if (wallJumpForm != "wallLeap")
+        {
+            wallJumpForm = "wallJump";
+        }
     }
 
     void LeapFromWall()
@@ -1192,6 +1201,8 @@ public class PlayerController : MonoBehaviour
         rb.gravityScale = initialGravity;
         currentMovementState = MovementStates.WallJump;
         rb.linearVelocity = new Vector2(wallJumpDirection.x * wallLeapHorizontalForce, wallLeapVerticalForce);
+        direction = wallJumpDirection.x;
+        PlayAnimation(wallLeapAnimation.ToString());
     }
 
     void WhileWallJumping()
@@ -1355,6 +1366,12 @@ public class PlayerController : MonoBehaviour
             case CombatStates.Neutral: // NEUTRAL
 
                 meleeWeapon.slashCooldownTimer -= Time.deltaTime;
+                
+                foreach (GameObject graphic in meleeWeapon.slashGraphics)
+                {
+                    if (graphic.active == false) continue;
+                    graphic.SetActive(false);
+                }
 
                 CheckForAttack();
 
@@ -1539,7 +1556,7 @@ public enum PlayerAnimations
     sideBashToFallTransitionSketch, sideBashFlipSketch,
     diagonalUpBashSketch, diagonalDownBashSketch,
     wallSlideStartSketch, wallSlideEndSketch,
-    wallLeapSketch
+    wallLeapSketch, wallJumpSketch
 }
 
 #endregion

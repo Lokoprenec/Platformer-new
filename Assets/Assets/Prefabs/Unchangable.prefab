@@ -8958,7 +8958,8 @@ MonoBehaviour:
   diagonalDownBashAnimation: 19
   wallSlideStartAnimation: 20
   wallSlideEndAnimation: 21
-  wallJumpAnimation: 22
+  wallLeapAnimation: 22
+  wallJumpAnimation: 23
   wallPressAnimation: 12
   runTransitionAnimation: 9
   landingRunTransitionAnimation: 11
