@@ -469,8 +469,35 @@ public class PlayerManager : MonoBehaviour
 
     #endregion
 
+    #region Progression
+
+    public void GetAbility(PlayerAbilities ability)
+    {
+        switch (ability)
+        {
+            case PlayerAbilities.WallJump:
+
+                pC.wallJumpEnabled = true;
+
+                break;
+
+            case PlayerAbilities.Bash:
+
+                pC.bashEnabled = true;
+
+                break;
+        }
+    }
+
+    #endregion
+
     public enum HealEffectAnimations
     {
         None, Healing, Healed
     }
+}
+
+public enum PlayerAbilities
+{
+    WallJump, Bash
 }

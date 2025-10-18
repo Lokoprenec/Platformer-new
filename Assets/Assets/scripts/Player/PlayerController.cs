@@ -138,6 +138,7 @@ public class PlayerController : MonoBehaviour
     public float wallLeapVerticalForce;
     public float wallFlipHorizontalForce;
     public float wallFlipVerticalForce;
+    private string wallJumpForm;
 
     [Header("Knockback stun")]
     public float knockbackedHorizontalForce;
@@ -637,13 +638,15 @@ public class PlayerController : MonoBehaviour
 
             case MovementStates.WallJump: // WALL JUMP
 
-                wallJumpLockTimer -= Time.deltaTime;
-
-                WhileJumping();
+                WhileWallJumping();
 
                 if (wallJumpLockTimer < 0)
                 {
                     CheckForHorizontalMovement();
+                }
+                else
+                {
+                    wallJumpLockTimer -= Time.deltaTime;
                 }
 
                 CheckForAbilities();
@@ -1121,6 +1124,8 @@ public class PlayerController : MonoBehaviour
 
     void WallJump()
     {
+        wallJumpForm = "";
+
         switch (wallSlideSetDirection)
         {
             case 1:
@@ -1146,7 +1151,14 @@ public class PlayerController : MonoBehaviour
         jumpBufferCounter = 0;
         coyoteTimeCounter = 0;
 
+        CheckForJumpForm();
         Invoke("CheckForJumpForm", 0.1f);
+        Invoke("CheckForJumpForm", 0.1f);
+
+        if (wallJumpForm != "wallLeap")
+        {
+            wallJumpForm = "wallJump";
+        }
     }
 
     void CheckForJumpForm()
@@ -1176,33 +1188,23 @@ public class PlayerController : MonoBehaviour
     void LeapFromWall()
     {
         wallJumpLockTimer = wallJumpLockTime;
-
-        StartCoroutine(JumpToLeapVelocityTransition(
-            wallJumpDirection.x * wallLeapHorizontalForce,
-            wallLeapVerticalForce,
-            0.4f // transition duration in seconds
-        ));
+        wallJumpForm = "wallLeap";
+        rb.gravityScale = initialGravity;
+        currentMovementState = MovementStates.WallJump;
+        rb.linearVelocity = new Vector2(wallJumpDirection.x * wallLeapHorizontalForce, wallLeapVerticalForce);
     }
 
-    IEnumerator JumpToLeapVelocityTransition(float targetXVelocity, float targetYVelocity, float duration)
+    void WhileWallJumping()
     {
-        float elapsed = 0f;
-        Vector2 startVelocity = rb.linearVelocity;
-        Vector2 targetVelocity = new Vector2(targetXVelocity, targetYVelocity);
-
-        while (elapsed < duration)
+        if (rb.linearVelocityY < 0)
         {
-            elapsed += Time.deltaTime;
-            float t = elapsed / duration;
-
-            // Ease-out cubic: starts fast, slows down as it approaches target
-            t = 1f - Mathf.Pow(1f - t, 3);
-
-            rb.linearVelocity = Vector2.Lerp(startVelocity, targetVelocity, t);
-            yield return null;
+            SetStateToFall();
         }
 
-        rb.linearVelocity = targetVelocity; // snap to final value
+        if (!Input.GetKey(keybindManager.Jump))
+        {
+            rb.gravityScale = jumpCutGravity;
+        }
     }
 
     #endregion

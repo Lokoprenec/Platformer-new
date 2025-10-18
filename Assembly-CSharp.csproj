@@ -82,6 +82,7 @@
     <Compile Include="Assets\Assets\scripts\Enemy AI\ResourceGathering.cs" />
     <Compile Include="Assets\Assets\scripts\Enemy AI\Enemy behaviours\Crawler behaviour.cs" />
     <Compile Include="Assets\Assets\scripts\Enemy AI\SurroundingsDatabase.cs" />
+    <Compile Include="Assets\Assets\scripts\Other\Items and resources\AbilityPickup.cs" />
     <Compile Include="Assets\Assets\scripts\Other\Items and resources\ResourceData.cs" />
     <Compile Include="Assets\Assets\scripts\Enemy AI\Damage Info\DamageInfo.cs" />
     <Compile Include="Assets\Assets\scripts\Other\Items and resources\ObjectPooling.cs" />

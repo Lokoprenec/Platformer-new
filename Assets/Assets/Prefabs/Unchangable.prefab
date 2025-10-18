@@ -462,6 +462,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   manager: {fileID: 940722480392986172}
+  itemLayer:
+    serializedVersion: 2
+    m_Bits: 2048
 --- !u!1 &263161738130565000
 GameObject:
   m_ObjectHideFlags: 0
@@ -9017,9 +9020,9 @@ MonoBehaviour:
   wallJumpCoyoteTime: 0.1
   maxWallSlideSpeed: 20
   wallJumpHorizontalForce: 4
-  wallJumpVerticalForce: 18
+  wallJumpVerticalForce: 20
   wallLeapHorizontalForce: 12
-  wallLeapVerticalForce: 8
+  wallLeapVerticalForce: 18
   wallFlipHorizontalForce: 20
   wallFlipVerticalForce: 10
   knockbackedHorizontalForce: 20
@@ -9085,7 +9088,7 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 8
-  sceneTransition: {fileID: 0}
+  sceneTransition: {fileID: 478289637204387232}
 --- !u!96 &6919464148750393297
 TrailRenderer:
   serializedVersion: 3
