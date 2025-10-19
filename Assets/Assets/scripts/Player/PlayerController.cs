@@ -93,6 +93,7 @@ public class PlayerController : MonoBehaviour
     public bool isAbsolutelySafelyGrounded;
     public float groundCheckDistance;
     public LayerMask groundLayer;
+    public LayerMask hazardLayer;
 
     [Header("Movement bonuses")]
     public float coyoteTime;
@@ -221,10 +222,12 @@ public class PlayerController : MonoBehaviour
 
             // Cast rays straight down from both sides
             RaycastHit2D leftHit = Physics2D.Raycast(leftStart, Vector2.down, checkDistance, groundLayer);
+            RaycastHit2D leftHitHazard = Physics2D.Raycast(leftStart, Vector2.down, checkDistance, hazardLayer);
             RaycastHit2D rightHit = Physics2D.Raycast(rightStart, Vector2.down, checkDistance, groundLayer);
+            RaycastHit2D rightHitHazard = Physics2D.Raycast(rightStart, Vector2.down, checkDistance, hazardLayer);
 
             // Require both sides to have ground
-            isAbsolutelySafelyGrounded = leftHit.collider != null && rightHit.collider != null;
+            isAbsolutelySafelyGrounded = leftHit.collider != null && rightHit.collider != null && leftHitHazard.collider == null && rightHitHazard.collider == null;
 
             #if UNITY_EDITOR
             Debug.DrawRay(leftStart, Vector2.down * checkDistance, Color.red);
@@ -418,7 +421,11 @@ public class PlayerController : MonoBehaviour
 
         landingTimer -= Time.deltaTime;
 
-        if (currentMovementState == MovementStates.Healing)
+        if (currentMovementState == MovementStates.Locked)
+        {
+            PlayAnimation(idleAnimation.ToString());
+        }
+        else if (currentMovementState == MovementStates.Healing)
         {
             PlayAnimation(healingAnimation.ToString());
         }
@@ -1529,7 +1536,7 @@ public class PlayerController : MonoBehaviour
 
 public enum MovementStates
 {
-    Idle, Walk, Jump, Fall, Dash, ExitDash, WallSlide, WallJump, Knockbacked, AttackPushback, Healing, Pogo
+    Idle, Walk, Jump, Fall, Dash, ExitDash, WallSlide, WallJump, Knockbacked, AttackPushback, Healing, Pogo, Locked
 }
 
 public enum CombatStates

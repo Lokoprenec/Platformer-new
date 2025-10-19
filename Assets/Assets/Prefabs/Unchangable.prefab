@@ -8994,6 +8994,9 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 8
+  hazardLayer:
+    serializedVersion: 2
+    m_Bits: 512
   coyoteTime: 0.1
   jumpBufferTime: 0.1
   bashEnabled: 0
@@ -9072,6 +9075,8 @@ MonoBehaviour:
   activeCheckpointColor: {r: 0.608083, g: 1, b: 0.4009434, a: 1}
   inactiveCheckpointColor: {r: 0, g: 0.5566038, b: 0.4321865, a: 1}
   hazardCheckpointCooldown: 1
+  hazardStunTime: 0.5
+  hazardStunned: 0
   healTime: 2
   healTimer: 0
   healAmount: 1

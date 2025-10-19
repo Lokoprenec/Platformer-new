@@ -11,6 +11,7 @@ public class PlayerManager : MonoBehaviour
     #region General
 
     [Header("Health")]
+    private Rigidbody2D rb;
     private SpriteRenderer sR;
     public PlayerController pC;
     public GameObject healthBar;
@@ -34,6 +35,9 @@ public class PlayerManager : MonoBehaviour
     private string respawnScene;
     public float hazardCheckpointCooldown;
     private float hazardCheckpointTimer;
+    public float hazardStunTime;
+    private float hazardStunTimer;
+    public bool hazardStunned;
     private Vector2 hazardCheckpoint;
     public float healTime;
     public float healTimer;
@@ -60,6 +64,7 @@ public class PlayerManager : MonoBehaviour
 
     private void Start()
     {
+        rb = GetComponent<Rigidbody2D>();
         col = GetComponent<BoxCollider2D>();
         pC = GetComponent<PlayerController>();
         sR = pC.graphic.GetComponent<SpriteRenderer>();
@@ -125,6 +130,18 @@ public class PlayerManager : MonoBehaviour
         {
             soulBarMeterGraphic.color = inactiveSoulColor;
         }
+
+        if (hazardStunTimer > 0)
+        {
+            rb.linearVelocityX = 0;
+            pC.currentMovementState = MovementStates.Locked;
+            hazardStunTimer -= Time.deltaTime;
+        }
+        else if (hazardStunned)
+        {
+            pC.currentMovementState = MovementStates.Idle;
+            hazardStunned = false;
+        }
     }
 
     #endregion
@@ -173,6 +190,7 @@ public class PlayerManager : MonoBehaviour
         checkpoint.Activate();
         respawnScene = SceneManager.GetActiveScene().name;
         health = maxHealth;
+        WorldPersistenceManager.Instance?.ResetAllEnemyStates();
     }
 
     #endregion
@@ -388,6 +406,8 @@ public class PlayerManager : MonoBehaviour
         health -= 1;
         transform.position = hazardCheckpoint;
         pC.knockbackedStunTimer = 0;
+        hazardStunned = true;
+        hazardStunTimer = hazardStunTime;
     }
 
     public void CheckForDeath()
@@ -400,6 +420,7 @@ public class PlayerManager : MonoBehaviour
 
     public void Death()
     {
+        WorldPersistenceManager.Instance?.ResetAllEnemyStates();
         LoadRespawnScene();
     }
 

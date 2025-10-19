@@ -216,6 +216,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 602944904916495779, guid: 370a7bbec43b78444a33aa70bbcd1485, type: 3}
   m_PrefabInstance: {fileID: 73779722}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &178915643 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 379195191024709948, guid: dfe4b8d83a31582449d00d8a06252c85, type: 3}
+  m_PrefabInstance: {fileID: 531918466}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &216735473
 GameObject:
   m_ObjectHideFlags: 0
@@ -267,6 +272,7 @@ GameObject:
   - component: {fileID: 424366870}
   - component: {fileID: 424366869}
   - component: {fileID: 424366868}
+  - component: {fileID: 424366873}
   m_Layer: 16
   m_Name: CurrencyDrop
   m_TagString: Untagged
@@ -321,6 +327,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3388e9ff376fd404ebb23c9d3ea42951, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  resourceDropID: 
   resourceDrop: {fileID: 424366868}
   maxHealth: 5
   health: 0
@@ -456,6 +463,19 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &424366873
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 424366866}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28d2ea385ce746648b3d6a6ab63942d8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  uniqueId: a0e56a5c-4051-4030-a8ca-7ce5e9a96050
 --- !u!1 &440829332
 GameObject:
   m_ObjectHideFlags: 0
@@ -681,13 +701,29 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 379195191024709948, guid: dfe4b8d83a31582449d00d8a06252c85, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 531918475}
   m_SourcePrefab: {fileID: 100100000, guid: dfe4b8d83a31582449d00d8a06252c85, type: 3}
 --- !u!4 &531918467 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8793441947642004473, guid: dfe4b8d83a31582449d00d8a06252c85, type: 3}
   m_PrefabInstance: {fileID: 531918466}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &531918475
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 178915643}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28d2ea385ce746648b3d6a6ab63942d8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  uniqueId: f35d4a3a-ca92-45f7-9a5a-c749b79b15a7
 --- !u!1 &610952095
 GameObject:
   m_ObjectHideFlags: 0
@@ -913,8 +949,8 @@ Transform:
   m_GameObject: {fileID: 783157573}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -59.3432, y: 37.1315, z: 12.771958}
-  m_LocalScale: {x: 39.707775, y: 5.810762, z: 1}
+  m_LocalPosition: {x: 23.6096, y: 39.4304, z: 12.771958}
+  m_LocalScale: {x: 205.6181, y: 10.407936, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1656522629}
@@ -1061,6 +1097,7 @@ GameObject:
   - component: {fileID: 842006670}
   - component: {fileID: 842006669}
   - component: {fileID: 842006668}
+  - component: {fileID: 842006673}
   m_Layer: 16
   m_Name: CurrencyDrop (2)
   m_TagString: Untagged
@@ -1115,6 +1152,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3388e9ff376fd404ebb23c9d3ea42951, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  resourceDropID: 
   resourceDrop: {fileID: 842006668}
   maxHealth: 5
   health: 0
@@ -1250,6 +1288,19 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &842006673
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 842006666}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28d2ea385ce746648b3d6a6ab63942d8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  uniqueId: 8f08d175-1448-4c5a-bab2-7bea62824a74
 --- !u!1 &888388016
 GameObject:
   m_ObjectHideFlags: 0
@@ -2138,6 +2189,7 @@ GameObject:
   - component: {fileID: 1157893314}
   - component: {fileID: 1157893313}
   - component: {fileID: 1157893312}
+  - component: {fileID: 1157893317}
   m_Layer: 16
   m_Name: CurrencyDrop (3)
   m_TagString: Untagged
@@ -2192,6 +2244,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3388e9ff376fd404ebb23c9d3ea42951, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  resourceDropID: 
   resourceDrop: {fileID: 1157893312}
   maxHealth: 5
   health: 0
@@ -2327,6 +2380,19 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1157893317
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1157893310}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28d2ea385ce746648b3d6a6ab63942d8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  uniqueId: a67313be-bd9e-430c-937c-a05a40e8dc8c
 --- !u!1001 &1166899397
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2852,6 +2918,7 @@ GameObject:
   - component: {fileID: 1594190298}
   - component: {fileID: 1594190297}
   - component: {fileID: 1594190296}
+  - component: {fileID: 1594190301}
   m_Layer: 16
   m_Name: CurrencyDrop (1)
   m_TagString: Untagged
@@ -2906,6 +2973,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3388e9ff376fd404ebb23c9d3ea42951, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  resourceDropID: 
   resourceDrop: {fileID: 1594190296}
   maxHealth: 5
   health: 0
@@ -3041,6 +3109,19 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1594190301
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1594190294}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28d2ea385ce746648b3d6a6ab63942d8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  uniqueId: 1dc42e41-c290-4822-bb19-3a4616c8eeab
 --- !u!1 &1611121045
 GameObject:
   m_ObjectHideFlags: 0

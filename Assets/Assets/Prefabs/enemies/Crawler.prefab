@@ -201,6 +201,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4fd974ec4851e54ba571b96b029fbf6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  enemyID: 
   resourceDrop: {fileID: 8731396400599404420}
   graphic: {fileID: 434526679096371163}
   movementLogic: {fileID: 238053463204856745}

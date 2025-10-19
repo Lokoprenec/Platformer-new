@@ -2,7 +2,9 @@ using UnityEngine;
 
 public class EnemyManager : MonoBehaviour
 {
+    public string enemyID;
     private Rigidbody2D rb;
+    private UniqueID IDManager;
     public ResourceDrop resourceDrop;
     public SpriteRenderer graphic;
     public MonoBehaviour movementLogic;
@@ -26,6 +28,18 @@ public class EnemyManager : MonoBehaviour
         health = maxHealth;
         rb = GetComponent<Rigidbody2D>();
         graphic.color = normalColor;
+
+        IDManager = GetComponent<UniqueID>();
+
+        if (IDManager != null)
+        {
+            enemyID = IDManager.ID;
+
+            var state = GetOrCreateEnemyState();
+
+            if (state.isDead)
+                Disable();
+        }
     }
 
     // Update is called once per frame
@@ -70,6 +84,14 @@ public class EnemyManager : MonoBehaviour
         graphic.color = normalColor;
     }
 
+    private void OnTriggerStay2D(Collider2D collision)
+    {
+        if (collision.gameObject.CompareTag("hazard"))
+        {
+            Death();
+        }
+    }
+
     void Death()
     {
         gameObject.layer = Mathf.RoundToInt(Mathf.Log(deathLayer.value, 2));
@@ -83,6 +105,43 @@ public class EnemyManager : MonoBehaviour
         hurtzone.SetActive(false);
         graphic.color = deathColor;
         movementLogic.enabled = false;
-        this.enabled = false;
+        enabled = false;
+
+        if (IDManager != null)
+        {
+            var state = GetOrCreateEnemyState();
+            state.isDead = true;
+        }
+    }
+
+    private EnemyState GetOrCreateEnemyState()
+    {
+        var enemies = WorldPersistenceManager.Instance?.enemies;
+        if (enemies == null)
+        {
+            Debug.LogWarning("No enemy list found in WorldPersistenceManager.");
+            return null;
+        }
+
+        var state = enemies.Find(e => e.enemyID == enemyID);
+        if (state == null)
+        {
+            state = new EnemyState { enemyID = enemyID, isDead = false };
+            enemies.Add(state);
+        }
+
+        return state;
+    }
+
+    void Disable()
+    {
+        var state = GetOrCreateEnemyState();
+        state.isDead = true;
+        gameObject.layer = Mathf.RoundToInt(Mathf.Log(deathLayer.value, 2));
+        rb.linearVelocityX = 0;
+        hurtzone.SetActive(false);
+        graphic.color = deathColor;
+        movementLogic.enabled = false;
+        enabled = false;
     }
 }

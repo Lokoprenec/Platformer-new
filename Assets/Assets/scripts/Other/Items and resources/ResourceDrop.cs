@@ -45,8 +45,12 @@ public class ResourceDrop : MonoBehaviour
 
         for (int i = amount; i > 0; i--)
         {
-            itemGenerator.GenerateItem(acquiredItems, data.itemType, data.itemName);
             data.amountLeft -= 1;
+
+            if (data.amountLeft > 0)
+            {
+                itemGenerator.GenerateItem(acquiredItems, data.itemType, data.itemName);
+            }
         }
 
         foreach (GameObject obj in acquiredItems)
