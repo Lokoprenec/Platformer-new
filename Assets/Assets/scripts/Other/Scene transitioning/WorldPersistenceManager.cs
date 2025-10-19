@@ -27,7 +27,7 @@ public class ResourceDropState
 {
     public string resourceDropID;
     public float health;
-    public List<ResourceData> data;
+    public List<ResourceData> data = new List<ResourceData>();
 }
 
 [DefaultExecutionOrder(-100)]
@@ -42,15 +42,13 @@ public class WorldPersistenceManager : MonoBehaviour
 
     void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else
+        if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
+            return;
         }
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
     }
 
     public void ResetAllEnemyStates()
